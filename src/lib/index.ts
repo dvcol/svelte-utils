@@ -1,1 +1,4 @@
-export const LIB_CONTENT = 'svelte-lib-template';
+export * from './component.js';
+export * from './transition.js';
+
+export * from './debounce.svelte.js';

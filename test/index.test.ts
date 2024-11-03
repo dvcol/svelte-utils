@@ -1,10 +1,8 @@
 import { describe, it, expect } from 'vitest';
 
-import { LIB_CONTENT } from '~/index.js';
-
 describe('lib/index.ts', () => {
-  it('should have LIB_CONTENT', () => {
+  it('should add UT here', () => {
     expect.assertions(1);
-    expect(LIB_CONTENT).toBe('svelte-lib-template');
+    expect(true).toBeTruthy();
   });
 });

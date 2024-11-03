@@ -1,2 +1,9 @@
-# svelte-lib-template
-A basic svelte pnpm library template
+# svelte-utils
+
+Set of helpfully utils
+
+## Installation
+
+```sh
+pnpm install @dvcol/svelte-utils
+```

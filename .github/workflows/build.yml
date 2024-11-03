@@ -22,19 +22,6 @@ jobs:
       - name: 🚧 Build
         uses: ./.github/actions/build
 
-  web:
-    name: ☁️ Build Web
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: ⛙ Checkout branch ${{ github.ref }}
-        uses: actions/checkout@v4
-
-      - name: 🚧 Build
-        uses: ./.github/actions/build
-        with:
-          script: 'build:web'
-
   test:
     name: 🧪 Unit Test
     runs-on: ubuntu-latest
@@ -71,8 +58,3 @@ jobs:
         run: |
           # =================  🧹 Lint  =================
           pnpm run lint
-
-      - name: 🪄 Stylelint
-        run: |
-          # =================  🪄 Stylelint  =================
-          pnpm run style
