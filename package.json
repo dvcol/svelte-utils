@@ -43,6 +43,10 @@
     "./debounce": {
       "types": "./dist/debounce.svelte.d.ts",
       "svelte": "./dist/debounce.svelte.js"
+    },
+    "./media": {
+      "types": "./dist/media.svelte.d.ts",
+      "svelte": "./dist/media.svelte.js"
     }
   },
   "files": [
