@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/dvcol/svelte-utils/compare/v1.1.0...v1.2.0) (2024-11-07)
+
+
+### Features
+
+* **media:** adds media query watcher ([05d381b](https://github.com/dvcol/svelte-utils/commit/05d381b59bdb3c4f0d54f23dfe66016c56844715))
+
 ## 1.1.0 (2024-11-03)
 
 
