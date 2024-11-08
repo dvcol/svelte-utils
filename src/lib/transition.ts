@@ -24,7 +24,7 @@ export interface FreezeParams {
 export type HeightParams = BaseParams & FreezeParams;
 
 /**
- * Animates the height of an element from 0 to the current opacity for `in` transitions and from the current opacity to 0 for `out` transitions.
+ * Animates the height of an element from 0 to the current height for `in` transitions and from the current height to 0 for `out` transitions.
  */
 export function height(
   node: Element,
@@ -84,7 +84,9 @@ export function width(
 export type ScaleFadeParams = BaseParams & ScaleParams & FreezeParams;
 
 /**
- * Animates the opacity and scale of an element. `in` transitions animate from an element's current (default) values to the provided values, passed as parameters. `out` transitions animate from the provided values to an element's default values.
+ * Animates the opacity and scale of an element.
+ * `in` transitions animate from an element's current (default) values to the provided values, passed as parameters.
+ * `out` transitions animate from the provided values to an element's default values.
  */
 export function scaleFadeInOut(
   node: Element,
