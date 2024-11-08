@@ -28,7 +28,7 @@ export type HeightParams = BaseParams & FreezeParams;
 export function height(
   node: Element,
   { delay = 0, duration = 400, easing = x => x, freeze = true }: HeightParams = {},
-  { direction }: { direction: 'in' | 'out' },
+  { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
   let _height = parseFloat(getComputedStyle(node).height);
   if (!_height || Number.isNaN(_height)) _height = 0;
@@ -56,7 +56,7 @@ export type WidthParams = BaseParams & FreezeParams;
 export function width(
   node: Element,
   { delay = 0, duration = 400, easing = x => x, freeze = true }: WidthParams = {},
-  { direction }: { direction: 'in' | 'out' },
+  { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
   let _width = parseFloat(getComputedStyle(node).width);
   if (!_width || Number.isNaN(_width)) _width = 0;
@@ -84,7 +84,7 @@ export type ScaleFadeParams = ScaleParams & FreezeParams;
 export function scaleFadeInOut(
   node: Element,
   { duration = 400, start = 0.95, freeze = true, ...params }: ScaleFadeParams = {},
-  { direction }: { direction: 'in' | 'out' },
+  { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
   const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
 
@@ -101,6 +101,42 @@ export function scaleFadeInOut(
     css: (t, u) => {
       if (!freeze || direction === 'in') return `${scaleCss?.(t, u)}`;
       return [`height: ${_height}px`, `width: ${_width}px`, scaleCss?.(t, u)].join(';\n');
+    },
+  };
+}
+
+/**
+ * Combines the `width` and `scale` transitions to animate the width of an element.
+ */
+export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFadeParams = {}): TransitionConfig {
+  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
+
+  const { css: widthCss } = width(node, { duration, ...params });
+
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t, u) => {
+      return [widthCss?.(t, u), scaleCss?.(t, u)].join(';\n');
+    },
+  };
+}
+
+/**
+ * Combines the `height` and `scale` transitions to animate the height of an element.
+ */
+export function scaleHeight(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFadeParams = {}): TransitionConfig {
+  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
+
+  const { css: heightCss } = height(node, { duration, ...params });
+
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t, u) => {
+      return [heightCss?.(t, u), scaleCss?.(t, u)].join(';\n');
     },
   };
 }
