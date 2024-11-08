@@ -1,5 +1,12 @@
 import { type EasingFunction, scale, type ScaleParams, type TransitionConfig } from 'svelte/transition';
 
+export type TransitionProps = Record<string, any>;
+export type TransitionFunction<T extends TransitionProps | undefined = TransitionProps | undefined> = (
+  node: Element,
+  props: T,
+  options: { direction: 'in' | 'out' },
+) => TransitionConfig | (() => TransitionConfig);
+
 export interface BaseParams {
   delay?: number;
   duration?: number;
