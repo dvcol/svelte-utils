@@ -47,6 +47,10 @@
     "./media": {
       "types": "./dist/media.svelte.d.ts",
       "svelte": "./dist/media.svelte.js"
+    },
+    "./watch": {
+      "types": "./dist/watch.svelte.d.ts",
+      "svelte": "./dist/watch.svelte.js"
     }
   },
   "files": [

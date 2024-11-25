@@ -8,10 +8,26 @@ export type TransitionFunction<T extends TransitionProps | undefined = Transitio
 ) => TransitionConfig | (() => TransitionConfig);
 
 export interface BaseParams {
+  /**
+   * Delay before the transition starts in milliseconds.
+   */
   delay?: number;
+  /**
+   * Duration of the transition in milliseconds.
+   */
   duration?: number;
+  /**
+   * Easing function to apply to the transition.
+   */
   easing?: EasingFunction;
+  /**
+   * Additional CSS to apply to the element during the transition.
+   */
   css?: string;
+  /**
+   * If `false`, the transition will not be applied on the first render.
+   */
+  initial?: boolean;
 }
 
 export interface FreezeParams {
