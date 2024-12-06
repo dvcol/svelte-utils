@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.5.0](https://github.com/dvcol/svelte-utils/compare/v1.4.0...v1.5.0) (2024-12-06)
+
+
+### Features
+
+* **component:** detect async fn as lazy components ([747836d](https://github.com/dvcol/svelte-utils/commit/747836df455e7d086bd64dc3c25dfa07eff1a188))
+
 ## [1.4.0](https://github.com/dvcol/svelte-utils/compare/v1.3.0...v1.4.0) (2024-11-25)
 
 
