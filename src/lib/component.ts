@@ -25,7 +25,16 @@ export const isLazyComponent = <
 >(
   component?: ComponentOrLazy<Props, Exports, Bindings>,
 ): component is LazyComponentImport<Props, Exports, Bindings> =>
-  !!(component && typeof component === 'function' && (component._isLazyComponent || component.name === 'component'));
+  !!(
+    component &&
+    typeof component === 'function' &&
+    // Wrapped with toLazyComponent
+    (component._isLazyComponent ||
+      // Wrapped in async function
+      component.constructor.name === 'AsyncFunction' ||
+      // Arrow function named as component
+      component.name === 'component')
+  );
 
 export type AnySnippet = Snippet<any>;
 
