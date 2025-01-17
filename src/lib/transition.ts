@@ -97,16 +97,16 @@ export function width(
   };
 }
 
-export type ScaleFadeParams = BaseParams & ScaleParams & FreezeParams;
+export type ScaleFreezeParams = BaseParams & ScaleParams & FreezeParams;
 
 /**
  * Animates the opacity and scale of an element.
  * `in` transitions animate from an element's current (default) values to the provided values, passed as parameters.
  * `out` transitions animate from the provided values to an element's default values.
  */
-export function scaleFadeInOut(
+export function scaleFreeze(
   node: Element,
-  { duration = 400, start = 0.95, freeze = true, css, ...params }: ScaleFadeParams = {},
+  { duration = 400, start = 0.95, freeze = true, css, ...params }: ScaleFreezeParams = {},
   { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
   const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
@@ -131,7 +131,7 @@ export function scaleFadeInOut(
 /**
  * Combines the `width` and `scale` transitions to animate the width of an element.
  */
-export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFadeParams = {}): TransitionConfig {
+export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFreezeParams = {}): TransitionConfig {
   const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
 
   const { css: widthCss } = width(node, { duration, ...params });
@@ -149,7 +149,7 @@ export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...par
 /**
  * Combines the `height` and `scale` transitions to animate the height of an element.
  */
-export function scaleHeight(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFadeParams = {}): TransitionConfig {
+export function scaleHeight(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFreezeParams = {}): TransitionConfig {
   const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
 
   const { css: heightCss } = height(node, { duration, ...params });

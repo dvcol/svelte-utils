@@ -51,6 +51,14 @@
     "./watch": {
       "types": "./dist/watch.svelte.d.ts",
       "svelte": "./dist/watch.svelte.js"
+    },
+    "./mutation": {
+      "types": "./dist/mutation.action.d.ts",
+      "svelte": "./dist/mutation.action.js"
+    },
+    "./resize": {
+      "types": "./dist/resize.action.d.ts",
+      "svelte": "./dist/resize.action.js"
     }
   },
   "files": [
