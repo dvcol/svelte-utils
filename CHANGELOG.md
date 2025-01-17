@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/dvcol/svelte-utils/compare/v1.5.0...v1.6.0) (2025-01-17)
+
+
+### Features
+
+* **actions:** adds resize & mutation actions ([601318e](https://github.com/dvcol/svelte-utils/commit/601318e0bcb9d33db6253a4f7ebbfec7e1cfb7d3))
+
 ## [1.5.0](https://github.com/dvcol/svelte-utils/compare/v1.4.0...v1.5.0) (2024-12-06)
 
 
