@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.6.1](https://github.com/dvcol/svelte-utils/compare/v1.6.0...v1.6.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* **action:** correct type signature ([c832a25](https://github.com/dvcol/svelte-utils/commit/c832a253b3fb5a65881518eb84a263b540589792))
+
 ## [1.6.0](https://github.com/dvcol/svelte-utils/compare/v1.5.0...v1.6.0) (2025-01-17)
 
 
