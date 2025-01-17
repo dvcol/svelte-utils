@@ -1,6 +1,6 @@
 import type { Action } from 'svelte/action';
 
-type MutationCallback = (entry: MutationRecord, index: number, entries: MutationRecord[]) => void;
+type MutationCallback = (entry: MutationRecord, index: number, entries: MutationRecord[]) => unknown;
 type MutationOptions = { callback: MutationCallback; options: MutationObserverInit };
 
 /**
@@ -10,7 +10,7 @@ type MutationOptions = { callback: MutationCallback; options: MutationObserverIn
  * @param node
  * @param parameters
  */
-export const mutation: Action<Element, MutationOptions> = (node: Element, parameters: MutationOptions | MutationCallback) => {
+export const mutation: Action<Element, MutationOptions | MutationCallback> = (node: Element, parameters: MutationOptions | MutationCallback) => {
   let observer: MutationObserver | null = null;
 
   function destroy() {
