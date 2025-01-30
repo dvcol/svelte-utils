@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.7.0](https://github.com/dvcol/svelte-utils/compare/v1.6.1...v1.7.0) (2025-01-30)
+
+
+### Features
+
+* **transition:** adds flipToggle & animation types ([12f61fc](https://github.com/dvcol/svelte-utils/commit/12f61fc57e0b9c3d8422dd1a585b0d9ac42f6961))
+
 ### [1.6.1](https://github.com/dvcol/svelte-utils/compare/v1.6.0...v1.6.1) (2025-01-17)
 
 
