@@ -1,3 +1,4 @@
+import { type AnimationConfig, flip, type FlipParams } from 'svelte/animate';
 import { type EasingFunction, scale, type ScaleParams, type TransitionConfig } from 'svelte/transition';
 
 export type TransitionProps = Record<string, any>;
@@ -6,6 +7,7 @@ export type TransitionFunction<T extends TransitionProps | undefined = Transitio
   props: T,
   options: { direction: 'in' | 'out' },
 ) => TransitionConfig | (() => TransitionConfig);
+export const emptyTransition: TransitionFunction = () => () => ({});
 
 export interface BaseParams {
   /**
@@ -58,8 +60,8 @@ export function height(
     duration,
     easing,
     css: t => {
-      let _css = '';
-      if (css?.length) _css = `${css};\n`;
+      let _css = 'overflow: hidden;\n';
+      if (css?.length) _css += `${css};\n`;
       _css += `height: ${t * _height}px`;
       if (!freeze || direction === 'in') return _css;
       return `${_css};\nwidth: ${_width}px`;
@@ -88,8 +90,8 @@ export function width(
     duration,
     easing,
     css: t => {
-      let _css = '';
-      if (css?.length) _css = `${css};\n`;
+      let _css = 'overflow: hidden;\n';
+      if (css?.length) _css += `${css};\n`;
       _css += `width: ${t * _width}px`;
       if (!freeze || direction === 'in') return _css;
       return `${_css};\nheight: ${_height}px`;
@@ -128,13 +130,19 @@ export function scaleFreeze(
   };
 }
 
+export type ScaleWidthParams = BaseParams &
+  ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; width?: Omit<WidthParams, 'duration' | 'delay' | 'easing'> };
+
 /**
  * Combines the `width` and `scale` transitions to animate the width of an element.
  */
-export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFreezeParams = {}): TransitionConfig {
-  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
+export function scaleWidth(
+  node: Element,
+  { duration = 400, start = 0.95, scale: scaleParam, width: widthParam, ...params }: ScaleWidthParams = {},
+): TransitionConfig {
+  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params, ...scaleParam });
 
-  const { css: widthCss } = width(node, { duration, ...params });
+  const { css: widthCss } = width(node, { duration, ...params, ...widthParam });
 
   return {
     delay,
@@ -146,13 +154,19 @@ export function scaleWidth(node: Element, { duration = 400, start = 0.95, ...par
   };
 }
 
+export type ScaleHeightParams = BaseParams &
+  ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; height?: Omit<HeightParams, 'duration' | 'delay' | 'easing'> };
+
 /**
  * Combines the `height` and `scale` transitions to animate the height of an element.
  */
-export function scaleHeight(node: Element, { duration = 400, start = 0.95, ...params }: ScaleFreezeParams = {}): TransitionConfig {
-  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
+export function scaleHeight(
+  node: Element,
+  { duration = 400, start = 0.95, scale: scaleParam, height: heightParam, ...params }: ScaleHeightParams = {},
+): TransitionConfig {
+  const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params, ...scaleParam });
 
-  const { css: heightCss } = height(node, { duration, ...params });
+  const { css: heightCss } = height(node, { duration, ...params, ...heightParam });
 
   return {
     delay,
@@ -163,3 +177,26 @@ export function scaleHeight(node: Element, { duration = 400, start = 0.95, ...pa
     },
   };
 }
+
+export type AnimationProps = Record<string, any>;
+export type AnimationFunction<T extends AnimationProps | undefined = AnimationProps | undefined> = (
+  node: Element,
+  directions: { from: DOMRect; to: DOMRect },
+  params?: T,
+) => AnimationConfig;
+export const emptyAnimation: AnimationFunction = () => ({});
+
+export type AnimationWithProps<T extends AnimationProps = AnimationProps> = {
+  /**
+   * Transition function.
+   */
+  use: AnimationFunction<T>;
+  /**
+   * Optional transition props.
+   */
+  props?: T;
+};
+
+export type FlipToggleParams = FlipParams & { enabled?: boolean };
+export const flipToggle: AnimationFunction<FlipToggleParams> = (node, directions, params) =>
+  params?.enabled === false ? {} : flip(node, directions, params);
