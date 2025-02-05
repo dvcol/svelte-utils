@@ -31,6 +31,10 @@ export type WatchOptions = {
    *   @see https://svelte.dev/docs/svelte/$effect
    */
   callback?: () => void;
+  /**
+   * Whether to run the logic inside the tracked scope
+   */
+  tracked?: boolean;
 };
 
 const wait = (options?: Pick<WatchOptions, 'next'>) => {
@@ -49,18 +53,22 @@ const useUntil = (options?: Pick<WatchOptions, 'until'>) => {
 
 /**
  * Create a function that wraps the logic to run when the sources change.
- * @param sources - getter function including all dependencies
- * @param logic - logic to run when sources change
+ * @param change - logic to run when sources change
+ * @param sources - getter function including tracked dependencies
  * @param options - watch options to control the behavior
- * @param tracked - Whether to run the logic inside the tracked scope
+ * @param options.tracked - whether to run the logic inside a tracked scope (default: false with sources, true without)
  */
-export const useEffect = (sources: () => unknown, logic: () => void, options: Omit<WatchOptions, 'pre' | 'root'> = {}, tracked = false) => {
+export const useEffect = (
+  change: Parameters<typeof untrack>[0],
+  sources?: () => unknown,
+  { tracked = !sources, ...options }: Omit<WatchOptions, 'pre' | 'root'> = {},
+) => {
   const until = useUntil(options);
   return () => {
-    sources();
+    sources?.();
     if (until(options)) return;
-    if (tracked) logic();
-    else untrack(logic);
+    if (tracked) change();
+    else untrack(change);
     wait(options);
     return options?.callback;
   };
@@ -69,35 +77,32 @@ export const useEffect = (sources: () => unknown, logic: () => void, options: Om
 /**
  * Watch for changes in the sources and run the logic.
  *
- * Logic will run outside of the tracked scope.
- * To run inside the tracked scope, use `$effect` or `effect` instead.
+ * Logic will run outside of the tracked scope if `sources` is provided or if `options.tracked` is explicitly false.
  *
- * @param sources - getter function including all dependencies
- * @param untracked - logic to run when sources change
+ * @param change - logic to run when sources change
+ * @param sources - getter function including tracked dependencies
  * @param options - watch options
+ * @param options.root - run outside tracked scope
+ * @param options.pre - run before tick
  */
-export function watch(sources: () => unknown, untracked: Parameters<typeof untrack>[0], options: WatchOptions = {}) {
-  const logic = useEffect(sources, untracked, options, false);
-  if (options.root) $effect.root(logic);
-  else if (options.pre) $effect.pre(logic);
+export function watch(change: Parameters<typeof untrack>[0], sources?: () => unknown, { root, pre, ...options }: WatchOptions = {}) {
+  const logic = useEffect(change, sources, options);
+  if (root) $effect.root(logic);
+  else if (pre) $effect.pre(logic);
   else $effect(logic);
 }
 
 /**
  * Watch for changes in the sources and run the logic.
  *
- * Logic will run inside the tracked scope.
- * To run outside the tracked scope, use `watch` instead.
+ * Logic will run inside of the tracked scope unless `options.tracked` is explicitly false.
  *
- * @param sources - getter function including all dependencies
- * @param tracked - logic to run when sources change
+ * @param change - logic to run when sources change
+ * @param sources - getter function including tracked dependencies
  * @param options - watch options
  */
-export function effect(sources: () => unknown, tracked: () => void, options: WatchOptions = {}) {
-  const logic = useEffect(sources, tracked, options, true);
-  if (options.root) $effect.root(logic);
-  else if (options.pre) $effect.pre(logic);
-  else $effect(logic);
+export function effect(change: Parameters<typeof untrack>[0], sources?: () => unknown, options: WatchOptions = {}) {
+  return watch(change, sources, { tracked: true, ...options });
 }
 
 export const doubleBind = <T = unknown, E = unknown>(
