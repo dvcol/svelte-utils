@@ -25,13 +25,6 @@ export type WatchOptions = {
    */
   next?: () => void;
   /**
-   *  If a callback is provided, it will run:
-   *   * immediately before the effect re-runs
-   *   * when the component is destroyed
-   *   @see https://svelte.dev/docs/svelte/$effect
-   */
-  callback?: () => void;
-  /**
    * Whether to run the logic inside the tracked scope
    */
   tracked?: boolean;
@@ -53,24 +46,29 @@ const useUntil = (options?: Pick<WatchOptions, 'until'>) => {
 
 /**
  * Create a function that wraps the logic to run when the sources change.
+ *
+ * If change returns a callback, it will run:
+ *  * immediately before the effect re-runs
+ *  * when the component is destroyed
+ * @see https://svelte.dev/docs/svelte/$effect
+ *
  * @param change - logic to run when sources change
  * @param sources - getter function including tracked dependencies
  * @param options - watch options to control the behavior
  * @param options.tracked - whether to run the logic inside a tracked scope (default: false with sources, true without)
  */
 export const useEffect = (
-  change: Parameters<typeof untrack>[0],
+  change: Parameters<typeof $effect>[0],
   sources?: () => unknown,
   { tracked = !sources, ...options }: Omit<WatchOptions, 'pre' | 'root'> = {},
-) => {
+): Parameters<typeof $effect>[0] => {
   const until = useUntil(options);
   return () => {
     sources?.();
     if (until(options)) return;
-    if (tracked) change();
-    else untrack(change);
+    const cb = tracked ? change() : untrack(change);
     wait(options);
-    return options?.callback;
+    return cb;
   };
 };
 
@@ -79,13 +77,18 @@ export const useEffect = (
  *
  * Logic will run outside of the tracked scope if `sources` is provided or if `options.tracked` is explicitly false.
  *
+ * If change returns a callback, it will run:
+ *  * immediately before the effect re-runs
+ *  * when the component is destroyed
+ * @see https://svelte.dev/docs/svelte/$effect
+ *
  * @param change - logic to run when sources change
  * @param sources - getter function including tracked dependencies
  * @param options - watch options
  * @param options.root - run outside tracked scope
  * @param options.pre - run before tick
  */
-export function watch(change: Parameters<typeof untrack>[0], sources?: () => unknown, { root, pre, ...options }: WatchOptions = {}) {
+export function watch(change: Parameters<typeof $effect>[0], sources?: () => unknown, { root, pre, ...options }: WatchOptions = {}) {
   const logic = useEffect(change, sources, options);
   if (root) $effect.root(logic);
   else if (pre) $effect.pre(logic);
@@ -97,11 +100,16 @@ export function watch(change: Parameters<typeof untrack>[0], sources?: () => unk
  *
  * Logic will run inside of the tracked scope unless `options.tracked` is explicitly false.
  *
+ * If change returns a callback, it will run:
+ *  * immediately before the effect re-runs
+ *  * when the component is destroyed
+ * @see https://svelte.dev/docs/svelte/$effect
+ *
  * @param change - logic to run when sources change
  * @param sources - getter function including tracked dependencies
  * @param options - watch options
  */
-export function effect(change: Parameters<typeof untrack>[0], sources?: () => unknown, options: WatchOptions = {}) {
+export function effect(change: Parameters<typeof $effect>[0], sources?: () => unknown, options: WatchOptions = {}) {
   return watch(change, sources, { tracked: true, ...options });
 }
 
@@ -113,7 +121,7 @@ export function effect(change: Parameters<typeof untrack>[0], sources?: () => un
  * @param output - logic to run when inner changes (only if different from outer)
  * @param options - watch options
  */
-export const doubleBind = <T = unknown, E = unknown>(
+export const doubleBind = <T = unknown>(
   {
     outer,
     inner,
@@ -122,25 +130,25 @@ export const doubleBind = <T = unknown, E = unknown>(
   }: {
     outer: () => T;
     inner: () => T;
-    input: () => E;
-    output: () => E;
+    input: Parameters<typeof $effect>[0];
+    output: Parameters<typeof $effect>[0];
   },
   options?: WatchOptions,
 ) => {
   watch(
-    outer,
     () => {
       if (outer() === inner()) return;
-      input();
+      return input();
     },
+    outer,
     options,
   );
   watch(
-    inner,
     () => {
       if (outer() === inner()) return;
-      output();
+      return output();
     },
+    inner,
     options,
   );
 };
