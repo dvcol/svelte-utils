@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.11.0](https://github.com/dvcol/svelte-utils/compare/v1.10.0...v1.11.0) (2025-02-05)
+
+
+### Features
+
+* **watch:** change api to make it less verbose ([bdc25b1](https://github.com/dvcol/svelte-utils/commit/bdc25b189fd20791f7d177946a2f822230588b22))
+
 ## [1.10.0](https://github.com/dvcol/svelte-utils/compare/v1.9.0...v1.10.0) (2025-02-05)
 
 
