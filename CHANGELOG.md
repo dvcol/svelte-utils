@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.9.0](https://github.com/dvcol/svelte-utils/compare/v1.8.1...v1.9.0) (2025-02-05)
+
+
+### Features
+
+* **watch:** adds next tick hook ([712c970](https://github.com/dvcol/svelte-utils/commit/712c970493ecfa1d8676fb437834b82bbee33dfc))
+
 ### [1.8.1](https://github.com/dvcol/svelte-utils/compare/v1.8.0...v1.8.1) (2025-02-05)
 
 
