@@ -105,6 +105,14 @@ export function effect(change: Parameters<typeof untrack>[0], sources?: () => un
   return watch(change, sources, { tracked: true, ...options });
 }
 
+/**
+ * Watch for differences between two getters output and run the logic if they change.
+ * @param outer - getter function to watch
+ * @param inner - getter function to watch
+ * @param input - logic to run when outer changes (only if different from inner)
+ * @param output - logic to run when inner changes (only if different from outer)
+ * @param options - watch options
+ */
 export const doubleBind = <T = unknown, E = unknown>(
   {
     outer,
@@ -117,7 +125,7 @@ export const doubleBind = <T = unknown, E = unknown>(
     input: () => E;
     output: () => E;
   },
-  options: WatchOptions,
+  options?: WatchOptions,
 ) => {
   watch(
     outer,
