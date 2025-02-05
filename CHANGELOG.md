@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.8.1](https://github.com/dvcol/svelte-utils/compare/v1.8.0...v1.8.1) (2025-02-05)
+
+
+### Bug Fixes
+
+* **watch:** move source before the condition ([1086faa](https://github.com/dvcol/svelte-utils/commit/1086faab1325f7120fa081cf9f3bf6ab1170cdc5))
+
 ## [1.8.0](https://github.com/dvcol/svelte-utils/compare/v1.7.0...v1.8.0) (2025-02-05)
 
 
