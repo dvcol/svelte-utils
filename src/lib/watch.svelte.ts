@@ -1,6 +1,11 @@
-import { untrack } from 'svelte';
+import { tick, untrack } from 'svelte';
 
-export type WatchOptions = { skipFirst?: boolean; skip?: () => boolean };
+export type WatchOptions = { skipFirst?: boolean; skip?: () => boolean; nextTick?: () => void };
+const wait = ({ nextTick }: WatchOptions = {}) => {
+  if (!nextTick) return;
+  tick().then(nextTick);
+};
+
 export function watch(sources: () => unknown, untracked: Parameters<typeof untrack>[0], options: WatchOptions = {}) {
   let first = true;
   const skip = ({ skipFirst }: WatchOptions = {}) => {
@@ -12,6 +17,7 @@ export function watch(sources: () => unknown, untracked: Parameters<typeof untra
     sources();
     if (skip(options)) return;
     untrack(untracked);
+    wait(options);
   });
 }
 
@@ -26,6 +32,7 @@ export function effect(sources: () => unknown, tracked: () => void, options: Wat
     sources();
     if (skip(options)) return;
     tracked();
+    wait(options);
   });
 }
 
