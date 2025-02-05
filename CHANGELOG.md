@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.10.0](https://github.com/dvcol/svelte-utils/compare/v1.9.0...v1.10.0) (2025-02-05)
+
+
+### Features
+
+* **watch:** make skip number based instead of boolean ([a5d4c32](https://github.com/dvcol/svelte-utils/commit/a5d4c3282a4a77043b76ae1e8465fc18baa31d9b))
+
 ## [1.9.0](https://github.com/dvcol/svelte-utils/compare/v1.8.1...v1.9.0) (2025-02-05)
 
 
