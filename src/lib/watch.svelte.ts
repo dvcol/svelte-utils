@@ -9,8 +9,8 @@ export function watch(sources: () => unknown, untracked: Parameters<typeof untra
     return skipFirst || options?.skip?.();
   };
   $effect(() => {
-    if (skip(options)) return;
     sources();
+    if (skip(options)) return;
     untrack(untracked);
   });
 }
@@ -23,8 +23,8 @@ export function effect(sources: () => unknown, tracked: () => void, options: Wat
     return skipFirst || options?.skip?.();
   };
   $effect(() => {
-    if (skip(options)) return;
     sources();
+    if (skip(options)) return;
     tracked();
   });
 }
