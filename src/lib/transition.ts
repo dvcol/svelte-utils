@@ -42,18 +42,36 @@ export interface FreezeParams {
 export type HeightParams = BaseParams & FreezeParams;
 
 /**
+ * Parses a CSS property from a string to a number.
+ * @param node - The element to parse the CSS property from.
+ * @param css - The CSS property to parse.
+ */
+export const parseCSSString = (node: Element, css: keyof CSSStyleDeclaration) => {
+  if (!node) return 0;
+  let value = getComputedStyle(node)[css];
+  if (typeof value === 'number') return value;
+  if (typeof value !== 'string') return 0;
+  if (!value) return 0;
+  value = parseFloat(value);
+  if (Number.isNaN(value)) return 0;
+  return value;
+};
+
+/**
  * Animates the height of an element from 0 to the current height for `in` transitions and from the current height to 0 for `out` transitions.
+ * @default { delay: 0, duration: 400, easing: x => x, freeze: true }
  */
 export function height(
   node: Element,
   { delay = 0, duration = 400, easing = x => x, freeze = true, css }: HeightParams = {},
   { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
-  let _height = parseFloat(getComputedStyle(node).height);
-  if (!_height || Number.isNaN(_height)) _height = 0;
-
-  let _width = parseFloat(getComputedStyle(node).width);
-  if (!_width || Number.isNaN(_width)) _width = 0;
+  const _height = parseCSSString(node, 'height');
+  const _width = parseCSSString(node, 'width');
+  const _marginTop = parseCSSString(node, 'marginTop');
+  const _marginBottom = parseCSSString(node, 'marginBottom');
+  const _paddingTop = parseCSSString(node, 'paddingTop');
+  const _paddingBottom = parseCSSString(node, 'paddingBottom');
 
   return {
     delay,
@@ -62,6 +80,10 @@ export function height(
     css: t => {
       let _css = 'overflow: hidden;\n';
       if (css?.length) _css += `${css};\n`;
+      if (_marginTop) _css += `margin-top: ${t * _marginTop}px;\n`;
+      if (_marginBottom) _css += `margin-bottom: ${t * _marginBottom}px;\n`;
+      if (_paddingTop) _css += `padding-top: ${t * _paddingTop}px;\n`;
+      if (_paddingBottom) _css += `padding-bottom: ${t * _paddingBottom}px;\n`;
       _css += `height: ${t * _height}px`;
       if (!freeze || direction === 'in') return _css;
       return `${_css};\nwidth: ${_width}px`;
@@ -73,17 +95,19 @@ export type WidthParams = BaseParams & FreezeParams;
 
 /**
  * Animates the width of an element from 0 to the current width for `in` transitions and from the current width to 0 for `out` transitions.
+ * @default { delay: 0, duration: 400, easing: x => x, freeze: true }
  */
 export function width(
   node: Element,
   { delay = 0, duration = 400, easing = x => x, freeze = true, css }: WidthParams = {},
   { direction }: { direction?: 'in' | 'out' } = {},
 ): TransitionConfig {
-  let _width = parseFloat(getComputedStyle(node).width);
-  if (!_width || Number.isNaN(_width)) _width = 0;
-
-  let _height = parseFloat(getComputedStyle(node).height);
-  if (!_height || Number.isNaN(_height)) _height = 0;
+  const _width = parseCSSString(node, 'width');
+  const _height = parseCSSString(node, 'height');
+  const _marginRight = parseCSSString(node, 'marginRight');
+  const _marginLeft = parseCSSString(node, 'marginLeft');
+  const _paddingRight = parseCSSString(node, 'paddingRight');
+  const _paddingLeft = parseCSSString(node, 'paddingLeft');
 
   return {
     delay,
@@ -92,6 +116,10 @@ export function width(
     css: t => {
       let _css = 'overflow: hidden;\n';
       if (css?.length) _css += `${css};\n`;
+      if (_marginRight) _css += `margin-right: ${t * _marginRight}px;\n`;
+      if (_marginLeft) _css += `margin-left: ${t * _marginLeft}px;\n`;
+      if (_paddingRight) _css += `padding-right: ${t * _paddingRight}px;\n`;
+      if (_paddingLeft) _css += `padding-left: ${t * _paddingLeft}px;\n`;
       _css += `width: ${t * _width}px`;
       if (!freeze || direction === 'in') return _css;
       return `${_css};\nheight: ${_height}px`;
@@ -105,6 +133,7 @@ export type ScaleFreezeParams = BaseParams & ScaleParams & FreezeParams;
  * Animates the opacity and scale of an element.
  * `in` transitions animate from an element's current (default) values to the provided values, passed as parameters.
  * `out` transitions animate from the provided values to an element's default values.
+ * @default { duration: 400, start: 0.95, freeze: true }
  */
 export function scaleFreeze(
   node: Element,
@@ -135,6 +164,7 @@ export type ScaleWidthParams = BaseParams &
 
 /**
  * Combines the `width` and `scale` transitions to animate the width of an element.
+ * @default { duration: 400, start: 0.95 }
  */
 export function scaleWidth(
   node: Element,
@@ -159,6 +189,7 @@ export type ScaleHeightParams = BaseParams &
 
 /**
  * Combines the `height` and `scale` transitions to animate the height of an element.
+ * @default { duration: 400, start: 0.95 }
  */
 export function scaleHeight(
   node: Element,

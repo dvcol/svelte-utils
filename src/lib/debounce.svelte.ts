@@ -4,7 +4,7 @@ import { debounce } from '@dvcol/common-utils/common/debounce';
  * Debounce a state and return a getter.
  *
  * @param getter a function that contains dependencies
- * @param delay debounce delay
+ * @param delay debounce delay (default 0)
  * @param cb error callback
  *
  * return a getter function to be derived
