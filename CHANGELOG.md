@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.13.1](https://github.com/dvcol/svelte-utils/compare/v1.13.0...v1.13.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* **transition:** make opacity configurable ([8bfe48a](https://github.com/dvcol/svelte-utils/commit/8bfe48a91771de35c762a359c5eeef61ff36265b))
+
 ## [1.13.0](https://github.com/dvcol/svelte-utils/compare/v1.12.0...v1.13.0) (2025-02-18)
 
 
