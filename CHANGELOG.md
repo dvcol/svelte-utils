@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.13.0](https://github.com/dvcol/svelte-utils/compare/v1.12.0...v1.13.0) (2025-02-18)
+
+
+### Features
+
+* **transition:** switch to slide & add composition ([ffe5add](https://github.com/dvcol/svelte-utils/commit/ffe5add8347d48e79a29e998fa4decaa8b5b3eb7))
+
 ## [1.12.0](https://github.com/dvcol/svelte-utils/compare/v1.11.2...v1.12.0) (2025-02-07)
 
 
