@@ -1,3 +1,4 @@
+import { clamp } from '@dvcol/common-utils/common/math';
 import { type AnimationConfig, flip, type FlipParams } from 'svelte/animate';
 import { type EasingFunction, scale, type ScaleParams, slide, type TransitionConfig } from 'svelte/transition';
 
@@ -104,6 +105,21 @@ const evaluateFn = (value: boolean | BaseParams['skip'] | BaseParams['freeze'], 
   return value;
 };
 
+export type OpacityParams = {
+  /**
+   * If `true`, the opacity will be gradually increased or decreased over the duration of the transition.
+   */
+  opacity?: boolean | number;
+};
+export type WidthParams = BaseParams & OpacityParams & TransformParams;
+
+const opacityRegex = /opacity: [0-9.]+;/;
+const replaceOpacity = (css: string, opacity: boolean | number = false, t: number) => {
+  if (opacity === false) return css.replace(opacityRegex, '');
+  if (opacity === true) return css.replace(opacityRegex, `opacity: ${t};`);
+  return css.replace(opacityRegex, `opacity: ${clamp(t, opacity, 1)};`);
+};
+
 export type HeightParams = BaseParams & OpacityParams & TransformParams;
 
 /**
@@ -128,20 +144,12 @@ export function height(
       if (evaluateFn(skip, node)) return '';
       let _css = css?.length ? `${css};\n` : '';
       if (heightCss) _css += heightCss(t, u);
-      _css = _css.replace(/opacity: [0-9.]+;/, opacity ? `opacity: ${t};` : '');
+      _css = replaceOpacity(_css, opacity, t);
       if (!evaluateFn(freeze, node) || direction === 'in') return transform(_css, t, u);
       return transform(`${_css};\nwidth: ${_width}px`, t, u);
     },
   };
 }
-
-export type OpacityParams = {
-  /**
-   * If `true`, the opacity will be gradually increased or decreased over the duration of the transition.
-   */
-  opacity?: boolean;
-};
-export type WidthParams = BaseParams & OpacityParams & TransformParams;
 
 /**
  * Animates the width of an element from 0 to the current width for `in` transitions and from the current width to 0 for `out` transitions.
@@ -165,7 +173,7 @@ export function width(
       if (evaluateFn(skip, node)) return '';
       let _css = css?.length ? `${css};\n` : '';
       if (widthCss) _css += widthCss(t, u);
-      _css = _css.replace(/opacity: [0-9.]+;/, opacity ? `opacity: ${t};` : '');
+      _css = replaceOpacity(_css, opacity, t);
       if (!evaluateFn(freeze, node) || direction === 'in') return transform(_css, t, u);
       return transform(`${_css};\nheight: ${_height}px`, t, u);
     },
