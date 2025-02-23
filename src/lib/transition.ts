@@ -107,17 +107,30 @@ const evaluateFn = (value: boolean | BaseParams['skip'] | BaseParams['freeze'], 
 
 export type OpacityParams = {
   /**
-   * If `true`, the opacity will be gradually increased or decreased over the duration of the transition.
+   * The opacity will be gradually increased (or decreased) over the duration of the transition.
+   * The opacity will range from the current (or minimum) opacity to the provided minimum (or current).
    */
-  opacity?: boolean | number;
+  opacity?:
+    | boolean
+    | {
+        /**
+         * Minimum opacity to respect (before entering, or after leaving)
+         * @default 0
+         */
+        minimum?: number;
+        /**
+         * Easing to use
+         * @default the parent transition easing
+         */
+        easing?: EasingFunction;
+      };
 };
 export type WidthParams = BaseParams & OpacityParams & TransformParams;
 
 const opacityRegex = /opacity: [0-9.]+;/;
-const replaceOpacity = (css: string, opacity: boolean | number = false, t: number) => {
-  if (opacity === false) return css.replace(opacityRegex, '');
-  if (opacity === true) return css.replace(opacityRegex, `opacity: ${t};`);
-  return css.replace(opacityRegex, `opacity: ${clamp(t, opacity, 1)};`);
+const replaceOpacity = (css: string, min: boolean | number = false, value: number) => {
+  if (min === false) return css.replace(opacityRegex, '');
+  return css.replace(opacityRegex, `opacity: ${clamp(value, typeof min === 'number' ? min : 0, 1)};`);
 };
 
 export type HeightParams = BaseParams & OpacityParams & TransformParams;
@@ -126,6 +139,7 @@ export type HeightParams = BaseParams & OpacityParams & TransformParams;
  * Animates the height of an element from 0 to the current height for `in` transitions and from the current height to 0 for `out` transitions.
  * If `freeze` is `true`, the width of the element will be frozen during the transition.
  * If `skip` is `true`, the transition will be skipped.
+ * If `opacity` is a truthy, the opacity will be gradually increased or decreased over the duration.
  * @default { easing: x => x, freeze: true, skip: false }
  */
 export function height(
@@ -135,6 +149,8 @@ export function height(
 ): TransitionConfig {
   const { delay, duration, css: heightCss } = slide(node, { axis: 'y', easing, ...params });
   const _width = parseCSSString(node, 'width');
+  const _opacity = +getComputedStyle(node).opacity;
+  const { minimum = 0, easing: opacityEasing = easing } = typeof opacity === 'object' ? opacity : {};
 
   return {
     delay,
@@ -144,7 +160,7 @@ export function height(
       if (evaluateFn(skip, node)) return '';
       let _css = css?.length ? `${css};\n` : '';
       if (heightCss) _css += heightCss(t, u);
-      _css = replaceOpacity(_css, opacity, t);
+      if (opacity) _css = replaceOpacity(_css, minimum, opacityEasing(t) * _opacity);
       if (!evaluateFn(freeze, node) || direction === 'in') return transform(_css, t, u);
       return transform(`${_css};\nwidth: ${_width}px`, t, u);
     },
@@ -155,6 +171,7 @@ export function height(
  * Animates the width of an element from 0 to the current width for `in` transitions and from the current width to 0 for `out` transitions.
  * If `freeze` is `true`, the width of the element will be frozen during the transition.
  * If `skip` is `true`, the transition will be skipped.
+ * If `opacity` is a number, the opacity will be gradually increased or decreased over the duration of the transition but never below the provided value.
  * @default { easing: x => x, freeze: true, skip: false }
  */
 export function width(
@@ -164,6 +181,8 @@ export function width(
 ): TransitionConfig {
   const { delay, duration, css: widthCss } = slide(node, { axis: 'x', easing, ...params });
   const _height = parseCSSString(node, 'height');
+  const _opacity = +getComputedStyle(node).opacity;
+  const { minimum = 0, easing: opacityEasing = easing } = typeof opacity === 'object' ? opacity : {};
 
   return {
     delay,
@@ -173,7 +192,7 @@ export function width(
       if (evaluateFn(skip, node)) return '';
       let _css = css?.length ? `${css};\n` : '';
       if (widthCss) _css += widthCss(t, u);
-      _css = replaceOpacity(_css, opacity, t);
+      if (opacity) _css = replaceOpacity(_css, minimum, opacityEasing(t) * _opacity);
       if (!evaluateFn(freeze, node) || direction === 'in') return transform(_css, t, u);
       return transform(`${_css};\nheight: ${_height}px`, t, u);
     },
