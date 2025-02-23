@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.14.0](https://github.com/dvcol/svelte-utils/compare/v1.13.1...v1.14.0) (2025-02-23)
+
+
+### Features
+
+* **transition:** adds custom opacity easing to width/height ([1091081](https://github.com/dvcol/svelte-utils/commit/1091081f15a90d823f7c207dd4151df199eb3861))
+
 ### [1.13.1](https://github.com/dvcol/svelte-utils/compare/v1.13.0...v1.13.1) (2025-02-18)
 
 
