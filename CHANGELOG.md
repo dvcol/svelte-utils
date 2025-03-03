@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.16.0](https://github.com/dvcol/svelte-utils/compare/v1.15.0...v1.16.0) (2025-03-03)
+
+
+### Features
+
+* **touch:** adds percent support ([5912eaa](https://github.com/dvcol/svelte-utils/commit/5912eaa91fc00761c265a6c66241aef67252697f))
+
 ## [1.15.0](https://github.com/dvcol/svelte-utils/compare/v1.14.0...v1.15.0) (2025-03-03)
 
 
