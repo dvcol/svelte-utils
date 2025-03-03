@@ -1,11 +1,11 @@
-import { type SwipeHandlers, type SwipeHooks, useSwipe } from './touch.svelte.js';
+import { type SwipeHandlers, type SwipeHooks, type SwipeNodeTolerances, useSwipe } from './touch.svelte.js';
 
-import type { ScrollState, SwipeTolerances } from '@dvcol/common-utils/common/touch';
+import type { ScrollState } from '@dvcol/common-utils/common/touch';
 import type { Action } from 'svelte/action';
 
-type SwipeOptions = {
+export type SwipeOptions = {
   onSwipe: SwipeHooks['onSwipe'];
-  tolerances?: SwipeTolerances;
+  tolerances?: SwipeNodeTolerances;
   scroll?: ScrollState;
 };
 
@@ -26,7 +26,7 @@ export const swipe: Action<Element, SwipeOptions | SwipeHooks['onSwipe']> = (nod
   function update(_options: SwipeOptions | SwipeHooks['onSwipe']) {
     destroy();
     const hooks = typeof _options === 'function' ? { onSwipe: _options } : _options;
-    handlers = useSwipe({ onSwipe: hooks?.onSwipe }, hooks?.tolerances, hooks?.scroll);
+    handlers = useSwipe({ onSwipe: hooks?.onSwipe }, { container: node, ...hooks?.tolerances }, hooks?.scroll);
     node.addEventListener('touchstart', handlers.ontouchstart as EventListenerOrEventListenerObject, { passive: true });
     node.addEventListener('touchend', handlers.ontouchend as EventListenerOrEventListenerObject, { passive: true });
   }

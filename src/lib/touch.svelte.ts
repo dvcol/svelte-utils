@@ -14,6 +14,37 @@ export type SwipeHandlers = {
   ontouchend: TouchEventHandler<HTMLDivElement>;
 };
 
+export type SwipeNodeTolerances = SwipeTolerances & {
+  horizontal?: SwipeTolerances['horizontal'] | `${number}%`;
+  up?: SwipeTolerances['up'] | `${number}%`;
+  down?: SwipeTolerances['down'] | `${number}%`;
+  vertical?: SwipeTolerances['vertical'] | `${number}%`;
+  left?: SwipeTolerances['left'] | `${number}%`;
+  right?: SwipeTolerances['right'] | `${number}%`;
+  container?: Element;
+};
+
+const percentRegex = /(\d+)%/;
+const toTolerances = ({ container, ...tolerances }: SwipeNodeTolerances = {}): SwipeTolerances | undefined => {
+  if (!tolerances || !Object.keys(tolerances)?.length) return undefined;
+  return Object.entries(tolerances).reduce<SwipeTolerances>((acc, [key, value]) => {
+    if (typeof value === 'number') {
+      acc[key as keyof SwipeTolerances] = value;
+    } else {
+      const percent = Number.parseFloat(value);
+      if (!percentRegex.test(value) || !container) {
+        if (!container) console.warn('[SwipeHandler] Node is missing or undefined, value will be used as number', value);
+        acc[key as keyof SwipeTolerances] = Number.parseFloat(value);
+      } else if (['horizontal', 'left', 'right'].includes(key)) {
+        acc[key as keyof SwipeTolerances] = (container.clientWidth * percent) / 100;
+      } else {
+        acc[key as keyof SwipeTolerances] = (container.clientHeight * percent) / 100;
+      }
+    }
+    return acc;
+  }, {});
+};
+
 /**
  * Register touch events handler for swipe detection.
  * @param onSwipe
@@ -24,7 +55,7 @@ export type SwipeHandlers = {
  */
 export const useSwipe = (
   { onSwipe, onTouchStart, onTouchEnd }: SwipeHooks = {},
-  tolerances?: SwipeTolerances,
+  tolerances?: SwipeNodeTolerances,
   scroll?: ScrollState,
 ): SwipeHandlers => {
   let scrollStart = $state({ x: window.scrollX, y: window.scrollY });
@@ -47,7 +78,7 @@ export const useSwipe = (
           start,
           end,
         },
-        tolerances,
+        toTolerances(tolerances),
         {
           start: scrollStart,
           end: { x: window.scrollX, y: window.scrollY },
