@@ -14,7 +14,7 @@ export type SwipeHandlers = {
   ontouchend: TouchEventHandler<HTMLDivElement>;
 };
 
-export type SwipeNodeTolerances = SwipeTolerances & {
+export type SwipeNodeTolerances = {
   horizontal?: SwipeTolerances['horizontal'] | `${number}%`;
   up?: SwipeTolerances['up'] | `${number}%`;
   down?: SwipeTolerances['down'] | `${number}%`;
@@ -22,7 +22,7 @@ export type SwipeNodeTolerances = SwipeTolerances & {
   left?: SwipeTolerances['left'] | `${number}%`;
   right?: SwipeTolerances['right'] | `${number}%`;
   container?: Element;
-};
+} & Omit<SwipeTolerances, 'horizontal' | 'up' | 'down' | 'vertical' | 'left' | 'right'>;
 
 const percentRegex = /(\d+)%/;
 const toTolerances = ({ container, ...tolerances }: SwipeNodeTolerances = {}): SwipeTolerances | undefined => {
