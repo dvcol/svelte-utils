@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.15.0](https://github.com/dvcol/svelte-utils/compare/v1.14.0...v1.15.0) (2025-03-03)
+
+
+### Features
+
+* **touch:** adds touch event handlers & action ([d460015](https://github.com/dvcol/svelte-utils/commit/d46001590ed7a019eaf6c3f7e42bd46ce02adfff))
+
 ## [1.14.0](https://github.com/dvcol/svelte-utils/compare/v1.13.1...v1.14.0) (2025-02-23)
 
 
