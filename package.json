@@ -59,6 +59,14 @@
     "./resize": {
       "types": "./dist/resize.action.d.ts",
       "svelte": "./dist/resize.action.js"
+    },
+    "./touch": {
+      "types": "./dist/touch.svelte.d.ts",
+      "svelte": "./dist/touch.svelte.js"
+    },
+    "./swipe": {
+      "types": "./dist/swipe.action.d.ts",
+      "svelte": "./dist/swipe.action.js"
     }
   },
   "files": [
@@ -94,7 +102,7 @@
     "svelte": ">=5"
   },
   "dependencies": {
-    "@dvcol/common-utils": "^1.23.1",
+    "@dvcol/common-utils": "^1.24.1",
     "svelte": "^5.19.7"
   },
   "devDependencies": {
