@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.16.1](https://github.com/dvcol/svelte-utils/compare/v1.16.0...v1.16.1) (2025-03-03)
+
+
+### Bug Fixes
+
+* **touch:** fix typing constraints ([e66a9b4](https://github.com/dvcol/svelte-utils/commit/e66a9b433c04c0a0e79399e4a20b4d066206f5d6))
+
 ## [1.16.0](https://github.com/dvcol/svelte-utils/compare/v1.15.0...v1.16.0) (2025-03-03)
 
 
