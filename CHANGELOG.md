@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.17.1](https://github.com/dvcol/svelte-utils/compare/v1.17.0...v1.17.1) (2025-03-09)
+
+
+### Bug Fixes
+
+* **focusin:** parametrize debounce ([8c0bf61](https://github.com/dvcol/svelte-utils/commit/8c0bf61100e7d066adc945c828590cd2c865e5a7))
+
 ## [1.17.0](https://github.com/dvcol/svelte-utils/compare/v1.16.1...v1.17.0) (2025-03-09)
 
 
