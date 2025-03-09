@@ -42,31 +42,48 @@
     },
     "./debounce": {
       "types": "./dist/debounce.svelte.d.ts",
+      "import": "./dist/debounce.svelte.js",
       "svelte": "./dist/debounce.svelte.js"
     },
     "./media": {
       "types": "./dist/media.svelte.d.ts",
+      "import": "./dist/media.svelte.js",
       "svelte": "./dist/media.svelte.js"
     },
     "./watch": {
       "types": "./dist/watch.svelte.d.ts",
+      "import": "./dist/watch.svelte.js",
       "svelte": "./dist/watch.svelte.js"
     },
     "./mutation": {
       "types": "./dist/mutation.action.d.ts",
+      "import": "./dist/mutation.action.js",
       "svelte": "./dist/mutation.action.js"
     },
     "./resize": {
       "types": "./dist/resize.action.d.ts",
+      "import": "./dist/resize.action.js",
       "svelte": "./dist/resize.action.js"
     },
     "./touch": {
       "types": "./dist/touch.svelte.d.ts",
+      "import": "./dist/touch.svelte.js",
       "svelte": "./dist/touch.svelte.js"
     },
     "./swipe": {
       "types": "./dist/swipe.action.d.ts",
+      "import": "./dist/swipe.action.js",
       "svelte": "./dist/swipe.action.js"
+    },
+    "./focusin": {
+      "types": "./dist/focusin.action.d.ts",
+      "import": "./dist/focusin.action.js",
+      "svelte": "./dist/focusin.action.js"
+    },
+    "./hovering": {
+      "types": "./dist/hovering.action.d.ts",
+      "import": "./dist/hovering.action.js",
+      "svelte": "./dist/hovering.action.js"
     }
   },
   "files": [
@@ -102,7 +119,7 @@
     "svelte": ">=5"
   },
   "dependencies": {
-    "@dvcol/common-utils": "^1.24.1",
+    "@dvcol/common-utils": "^1.26.1",
     "svelte": "^5.19.7"
   },
   "devDependencies": {

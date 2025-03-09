@@ -7,3 +7,5 @@ export * from './watch.svelte.js';
 
 export * from './resize.action.js';
 export * from './mutation.action.js';
+export * from './focusin.action.js';
+export * from './hovering.action.js';
