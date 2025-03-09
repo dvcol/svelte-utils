@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.17.0](https://github.com/dvcol/svelte-utils/compare/v1.16.1...v1.17.0) (2025-03-09)
+
+
+### Features
+
+* **action:** adds hovering & focusin actions ([98926ae](https://github.com/dvcol/svelte-utils/commit/98926ae591cd060ba0786ec6dd8545c954eefb81))
+
 ### [1.16.1](https://github.com/dvcol/svelte-utils/compare/v1.16.0...v1.16.1) (2025-03-03)
 
 
