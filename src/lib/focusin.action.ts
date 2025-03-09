@@ -21,6 +21,12 @@ export type FocusInOptions = {
    * @param value
    */
   onChange?: (value: boolean) => void;
+  /**
+   * Onblur debounce time in milliseconds.
+   *
+   * @default 0
+   */
+  debounce?: number;
 };
 export const focusin: Action<HTMLElement, FocusInOptions> = (node: HTMLElement, options: FocusInOptions) => {
   let params = options;
@@ -40,7 +46,7 @@ export const focusin: Action<HTMLElement, FocusInOptions> = (node: HTMLElement, 
     if (!params.focusin) return;
     if (node.contains(document.activeElement)) return;
     setState(false);
-  }, 0);
+  }, options.debounce ?? 0);
 
   node.addEventListener('focusin', onFocus, { passive: true });
   node.addEventListener('focusout', onBlur, { passive: true });
