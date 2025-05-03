@@ -22,7 +22,7 @@ export const mutation: Action<Element, MutationOptions | MutationCallback> = (no
     destroy();
 
     const cb = typeof options === 'function' ? options : options.callback;
-    const opt = typeof options === 'function' ? undefined : options.options;
+    const opt = typeof options === 'function' ? { childList: true } : options.options;
 
     observer = new MutationObserver(mutations => {
       mutations.forEach(cb);
