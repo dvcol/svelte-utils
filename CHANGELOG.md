@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.18.0](https://github.com/dvcol/svelte-utils/compare/v1.17.1...v1.18.0) (2025-05-24)
+
+
+### Features
+
+* **component:** refactor & bump dependencies ([f89e21e](https://github.com/dvcol/svelte-utils/commit/f89e21e9e2ec3a2aa5a684d90e04e60d78e75483))
+
+
+### Bug Fixes
+
+* **mutation:** default to childlist when options are omitted ([97ee858](https://github.com/dvcol/svelte-utils/commit/97ee858a11677555160bea89b9708f9f5e299e02))
+
 ### [1.17.1](https://github.com/dvcol/svelte-utils/compare/v1.17.0...v1.17.1) (2025-03-09)
 
 
