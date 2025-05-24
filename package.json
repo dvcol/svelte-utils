@@ -119,19 +119,19 @@
     "svelte": ">=5"
   },
   "dependencies": {
-    "@dvcol/common-utils": "^1.26.1",
-    "svelte": "^5.19.7"
+    "@dvcol/common-utils": "^1.31.2",
+    "svelte": "^5.33.1"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.7.1",
     "@commitlint/config-conventional": "^19.7.1",
     "@dvcol/eslint-plugin-presets": "^1.3.11",
-    "@sveltejs/adapter-auto": "^4.0.0",
-    "@sveltejs/kit": "^2.17.1",
-    "@sveltejs/package": "^2.3.10",
+    "@sveltejs/adapter-auto": "^6.0.1",
+    "@sveltejs/kit": "^2.21.1",
+    "@sveltejs/package": "^2.3.11",
     "@sveltejs/vite-plugin-svelte": "^5.0.3",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/svelte": "^5.2.6",
+    "@testing-library/svelte": "^5.2.8",
     "@testing-library/user-event": "^14.5.2",
     "@tsconfig/node22": "^22.0.0",
     "@tsconfig/svelte": "^5.0.4",
@@ -160,15 +160,15 @@
     "navigation-api-types": "^0.5.1",
     "npm-run-all2": "^7.0.2",
     "prettier": "^3.3.3",
-    "prettier-plugin-svelte": "^3.2.6",
+    "prettier-plugin-svelte": "^3.4.0",
     "publint": "^0.2.0",
     "sass": "^1.83.4",
     "standard-version": "^9.5.0",
-    "svelte-check": "^4.1.4",
+    "svelte-check": "^4.2.1",
     "typescript": "^5.5.4",
-    "vite": "^6.0.11",
-    "vite-plugin-checker": "^0.8.0",
-    "vitest": "^3.0.5"
+    "vite": "^6.3.5",
+    "vite-plugin-checker": "^0.9.3",
+    "vitest": "^3.1.4"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx,vue,svelte,json}": [

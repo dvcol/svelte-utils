@@ -58,7 +58,15 @@ export const toLazyComponent = <
   return component;
 };
 
-export const resolveComponent = async <
+export function isSyncComponentOrSnippet<
+  Props extends Record<string, any> = any,
+  Exports extends Record<string, any> = any,
+  Bindings extends keyof Props | string = string,
+>(component: ComponentOrLazy<Props, Exports, Bindings> | AnySnippet): component is AnyComponent<Props, Exports, Bindings> | AnySnippet {
+  return isSnippet(component) || !isLazyComponent(component);
+}
+
+export async function resolveComponent<
   Props extends Record<string, any> = any,
   Exports extends Record<string, any> = any,
   Bindings extends keyof Props | string = string,
@@ -75,19 +83,41 @@ export const resolveComponent = async <
     onLoaded?: (component?: Component<Props, Exports, Bindings> | AnySnippet) => unknown | Promise<unknown>;
     onError?: (error: unknown) => unknown | Promise<unknown>;
   } = {},
-): Promise<Component<Props, Exports, Bindings> | AnySnippet | undefined> => {
-  await onStart?.();
-  if (component && !isSnippet(component) && isLazyComponent(component)) {
-    onLoading?.();
-    try {
-      const awaited = await component();
-      await onLoaded?.(awaited.default);
-      return awaited.default;
-    } catch (error) {
-      await onError?.(error);
-      return undefined;
-    }
+): Promise<Component<Props, Exports, Bindings> | AnySnippet | AnyComponent<Props, Exports, Bindings> | undefined> {
+  if (!component || isSyncComponentOrSnippet(component)) {
+    await onStart?.();
+    await onLoaded?.(component);
+    return component;
   }
-  onLoaded?.(component);
-  return component;
-};
+  return resolveAsyncComponent(component, { onStart, onLoading, onLoaded, onError });
+}
+
+export async function resolveAsyncComponent<
+  Props extends Record<string, any> = any,
+  Exports extends Record<string, any> = any,
+  Bindings extends keyof Props | string = string,
+>(
+  component: LazyComponentImport<Props, Exports, Bindings>,
+  {
+    onStart,
+    onLoading,
+    onLoaded,
+    onError,
+  }: {
+    onStart?: () => unknown | Promise<unknown>;
+    onLoading?: () => unknown | Promise<unknown>;
+    onLoaded?: (component?: Component<Props, Exports, Bindings> | AnySnippet) => unknown | Promise<unknown>;
+    onError?: (error: unknown) => unknown | Promise<unknown>;
+  } = {},
+): Promise<AnyComponent<Props, Exports, Bindings> | undefined> {
+  await onStart?.();
+  onLoading?.();
+  try {
+    const awaited = await component();
+    await onLoaded?.(awaited.default);
+    return awaited.default;
+  } catch (error) {
+    await onError?.(error);
+    return undefined;
+  }
+}
