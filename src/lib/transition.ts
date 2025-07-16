@@ -316,10 +316,11 @@ export type FlipToggleParams = FlipParams & SkipParams;
 export const flipToggle: AnimationFunction<FlipToggleParams> = (node, directions, { skip, ...params } = {}) =>
   evaluateFn(skip, node) ? {} : flip(node, directions, params);
 
-type FlyValue = number | string | { value: number; unit: string };
+type FlyUnit = { value: number; unit: string };
+type FlyValue = number | string | FlyUnit;
 const regexCssUnit = /^\s*(-?[\d.]+)(\S*)\s*$/;
 
-function splitCssUnit(value: FlyValue): { value: number; unit: string } {
+function splitCssUnit(value: FlyValue): FlyUnit {
   if (typeof value === 'object') return value;
   if (typeof value === 'number') return { value, unit: 'px' };
   const split = value.match(regexCssUnit);
@@ -329,10 +330,21 @@ function splitCssUnit(value: FlyValue): { value: number; unit: string } {
   };
 }
 
+type StartValue = string | number | { x?: FlyValue; y?: FlyValue };
+type StartFunction = (options: { node: Element; style: CSSStyleDeclaration }) => StartValue;
+
+function parseStartValue(node: Element, style: CSSStyleDeclaration, start: StartValue | StartFunction): { x: string; y: string } {
+  const value = typeof start === 'function' ? start({ node, style }) : (start ?? {});
+  const { x = 0, y = 0 } = typeof value === 'object' ? value : { x: value, y: value };
+  const { value: x_value, unit: x_unit } = splitCssUnit(x);
+  const { value: y_value, unit: y_unit } = splitCssUnit(y);
+  return { x: `${x_value}${x_unit}`, y: `${y_value}${y_unit}` };
+}
+
 export type FlyFrom = Omit<FlyParams, 'x' | 'y'> & {
   x?: FlyValue;
   y?: FlyValue;
-  start?: number | { x?: number; y?: number };
+  start?: StartValue | StartFunction;
 };
 
 /* Animates the x and y positions and the opacity of an element. `in` transitions animate from the provided values, passed as parameters to the element's default values. `out` transitions animate from the element's default values to the provided values.
@@ -351,13 +363,13 @@ export function flyFrom(
   const od = target_opacity * (1 - opacity);
   const { value: x_value, unit: x_unit } = splitCssUnit(x);
   const { value: y_value, unit: y_unit } = splitCssUnit(y);
-  const { x: start_x = 0, y: start_y = 0 } = typeof start === 'number' ? { x: start, y: start } : start;
+  const { x: start_x, y: start_y } = parseStartValue(node, style, start);
   return {
     delay,
     duration,
     easing,
     css: (t, u) => `
-      transform: ${transform} translate(${start_x + (1 - t) * x_value}${x_unit}, ${start_y + (1 - t) * y_value}${y_unit});
+      transform: ${transform} translate(calc(${start_x} + ${(1 - t) * x_value}${x_unit}), calc(${start_y} + ${(1 - t) * y_value}${y_unit}));
       opacity: ${target_opacity - od * u}`,
   };
 }
