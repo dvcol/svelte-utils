@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.19.0](https://github.com/dvcol/svelte-utils/compare/v1.18.0...v1.19.0) (2025-07-16)
+
+
+### Features
+
+* **transition:** adds flyfrom transition ([df0c10e](https://github.com/dvcol/svelte-utils/commit/df0c10e7eb906bec6eef9c1f53a97ad622df3d18))
+
 ## [1.18.0](https://github.com/dvcol/svelte-utils/compare/v1.17.1...v1.18.0) (2025-05-24)
 
 
