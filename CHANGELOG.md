@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.20.0](https://github.com/dvcol/svelte-utils/compare/v1.19.0...v1.20.0) (2025-07-16)
+
+
+### Features
+
+* **transition:** make flyfrom start accept a function ([c2a05e7](https://github.com/dvcol/svelte-utils/commit/c2a05e7ceac0d6e4876c571b6e0408dceb9a9f1e))
+
 ## [1.19.0](https://github.com/dvcol/svelte-utils/compare/v1.18.0...v1.19.0) (2025-07-16)
 
 
