@@ -1,6 +1,7 @@
 import { clamp } from '@dvcol/common-utils/common/math';
 import { type AnimationConfig, flip, type FlipParams } from 'svelte/animate';
-import { type EasingFunction, scale, type ScaleParams, slide, type TransitionConfig } from 'svelte/transition';
+import { cubicOut } from 'svelte/easing';
+import { type EasingFunction, type FlyParams, scale, type ScaleParams, slide, type TransitionConfig } from 'svelte/transition';
 
 export type TransitionProps = Record<string, any>;
 export type TransitionFunction<T extends TransitionProps | undefined = TransitionProps | undefined> = (
@@ -19,7 +20,7 @@ export type AnimationFunction<T extends AnimationProps | undefined = AnimationPr
 export const emptyAnimation: AnimationFunction = () => ({});
 
 export type TransitionWithProps<
-  T extends TransitionProps = TransitionProps,
+  T extends TransitionProps | undefined = TransitionProps,
   F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
 > = {
   /**
@@ -32,7 +33,7 @@ export type TransitionWithProps<
   props?: T;
 };
 
-export type AnimationWithProps<T extends AnimationProps = AnimationProps> = {
+export type AnimationWithProps<T extends AnimationProps | undefined = AnimationProps> = {
   /**
    * Transition function.
    */
@@ -314,3 +315,49 @@ export function scaleHeight(
 export type FlipToggleParams = FlipParams & SkipParams;
 export const flipToggle: AnimationFunction<FlipToggleParams> = (node, directions, { skip, ...params } = {}) =>
   evaluateFn(skip, node) ? {} : flip(node, directions, params);
+
+type FlyValue = number | string | { value: number; unit: string };
+const regexCssUnit = /^\s*(-?[\d.]+)(\S*)\s*$/;
+
+function splitCssUnit(value: FlyValue): { value: number; unit: string } {
+  if (typeof value === 'object') return value;
+  if (typeof value === 'number') return { value, unit: 'px' };
+  const split = value.match(regexCssUnit);
+  return {
+    value: Number.parseFloat(split?.[1] ?? '0'),
+    unit: split?.[2] || 'px',
+  };
+}
+
+export type FlyFrom = Omit<FlyParams, 'x' | 'y'> & {
+  x?: FlyValue;
+  y?: FlyValue;
+  start?: number | { x?: number; y?: number };
+};
+
+/* Animates the x and y positions and the opacity of an element. `in` transitions animate from the provided values, passed as parameters to the element's default values. `out` transitions animate from the element's default values to the provided values.
+ *
+ * @param {Element} node
+ * @param {FlyFrom} [params]
+ * @returns {TransitionConfig}
+ */
+export function flyFrom(
+  node: Element,
+  { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0, start = 0 }: FlyFrom = {},
+): TransitionConfig {
+  const style = getComputedStyle(node);
+  const target_opacity = +style.opacity;
+  const transform = style.transform === 'none' ? '' : style.transform;
+  const od = target_opacity * (1 - opacity);
+  const { value: x_value, unit: x_unit } = splitCssUnit(x);
+  const { value: y_value, unit: y_unit } = splitCssUnit(y);
+  const { x: start_x = 0, y: start_y = 0 } = typeof start === 'number' ? { x: start, y: start } : start;
+  return {
+    delay,
+    duration,
+    easing,
+    css: (t, u) => `
+      transform: ${transform} translate(${start_x + (1 - t) * x_value}${x_unit}, ${start_y + (1 - t) * y_value}${y_unit});
+      opacity: ${target_opacity - od * u}`,
+  };
+}
