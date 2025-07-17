@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.21.0](https://github.com/dvcol/svelte-utils/compare/v1.20.0...v1.21.0) (2025-07-17)
+
+
+### Features
+
+* **transition:** adds scale to flyfrom ([d7f70e9](https://github.com/dvcol/svelte-utils/commit/d7f70e9787f9fe8b046e770d76e0761445a5e0d9))
+
 ## [1.20.0](https://github.com/dvcol/svelte-utils/compare/v1.19.0...v1.20.0) (2025-07-16)
 
 
