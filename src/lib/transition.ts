@@ -341,10 +341,16 @@ function parseStartValue(node: Element, style: CSSStyleDeclaration, start: Start
   return { x: `${x_value}${x_unit}`, y: `${y_value}${y_unit}` };
 }
 
+export function scaleValue(start = 0) {
+  const sd = 1 - start;
+  return (t: number, u: number) => `scale(${1 - sd * u}`;
+}
+
 export type FlyFrom = Omit<FlyParams, 'x' | 'y'> & {
   x?: FlyValue;
   y?: FlyValue;
   start?: StartValue | StartFunction;
+  scale?: number;
 };
 
 /* Animates the x and y positions and the opacity of an element. `in` transitions animate from the provided values, passed as parameters to the element's default values. `out` transitions animate from the element's default values to the provided values.
@@ -355,7 +361,7 @@ export type FlyFrom = Omit<FlyParams, 'x' | 'y'> & {
  */
 export function flyFrom(
   node: Element,
-  { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0, start = 0 }: FlyFrom = {},
+  { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0, start = 0, scale: scaleStart }: FlyFrom = {},
 ): TransitionConfig {
   const style = getComputedStyle(node);
   const target_opacity = +style.opacity;
@@ -368,8 +374,19 @@ export function flyFrom(
     delay,
     duration,
     easing,
-    css: (t, u) => `
-      transform: ${transform} translate(calc(${start_x} + ${(1 - t) * x_value}${x_unit}), calc(${start_y} + ${(1 - t) * y_value}${y_unit}));
-      opacity: ${target_opacity - od * u}`,
+    css: (t, u) =>
+      [
+        `opacity: ${target_opacity - od * u}`,
+        [
+          'transform:',
+          transform,
+          `translate(calc(${start_x} + ${(1 - t) * x_value}${x_unit}), calc(${start_y} + ${(1 - t) * y_value}${y_unit}))`,
+          scale === undefined ? undefined : scaleValue(scaleStart)(t, u),
+        ]
+          .filter(Boolean)
+          .join(' '),
+      ]
+        .filter(Boolean)
+        .join(';\n'),
   };
 }
