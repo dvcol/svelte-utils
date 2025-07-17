@@ -361,7 +361,7 @@ export type FlyFrom = Omit<FlyParams, 'x' | 'y'> & {
  */
 export function flyFrom(
   node: Element,
-  { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0, start = 0, scale: scaleStart }: FlyFrom = {},
+  { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0, start = 0, scale: scaleStart = 1 }: FlyFrom = {},
 ): TransitionConfig {
   const style = getComputedStyle(node);
   const target_opacity = +style.opacity;
