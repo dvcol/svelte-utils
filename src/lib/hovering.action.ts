@@ -8,27 +8,28 @@ export type HoveringOptions = {
   hovered?: boolean;
   /**
    * Event handler that fires when the hovered state changes.
-   * @param value
+   * @param value - New hovered state
+   * @param e - PointerEvent that triggered the change
    */
-  onChange?: (value: boolean) => void;
+  onChange?: (value: boolean, e: PointerEvent) => void;
 };
 export const hovering: Action<HTMLElement, HoveringOptions> = (node: HTMLElement, options: HoveringOptions) => {
   let params = options;
 
-  const setState = (value: boolean) => {
+  const setState = (value: boolean, e: PointerEvent) => {
     if (value === params.hovered) return;
     params.hovered = value;
-    params.onChange?.(value);
+    params.onChange?.(value, e);
   };
 
-  const onPointerEnter = () => {
+  const onPointerEnter = (e: PointerEvent) => {
     if (params.hovered) return;
-    setState(true);
+    setState(true, e);
   };
 
-  const onPointerLeave = () => {
+  const onPointerLeave = (e: PointerEvent) => {
     if (!params.hovered) return;
-    setState(false);
+    setState(false, e);
   };
 
   node.addEventListener('pointerenter', onPointerEnter, { passive: true });

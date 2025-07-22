@@ -18,9 +18,10 @@ export type FocusInOptions = {
   mirror?: boolean;
   /**
    * Event handler that fires when the focusin state changes.
-   * @param value
+   * @param value - New focusin state
+   * @param e - FocusEvent that triggered the change
    */
-  onChange?: (value: boolean) => void;
+  onChange?: (value: boolean, e: FocusEvent) => void;
   /**
    * Onblur debounce time in milliseconds.
    *
@@ -31,21 +32,21 @@ export type FocusInOptions = {
 export const focusin: Action<HTMLElement, FocusInOptions> = (node: HTMLElement, options: FocusInOptions) => {
   let params = options;
 
-  const setState = (value: boolean) => {
+  const setState = (value: boolean, e: FocusEvent) => {
     if (value === params.focusin) return;
     params.focusin = value;
-    params.onChange?.(value);
+    params.onChange?.(value, e);
   };
 
-  const onFocus = () => {
+  const onFocus = (e: FocusEvent) => {
     if (params.focusin) return;
-    setState(true);
+    setState(true, e);
   };
 
-  const onBlur = debounce(() => {
+  const onBlur = debounce((e: FocusEvent) => {
     if (!params.focusin) return;
     if (node.contains(document.activeElement)) return;
-    setState(false);
+    setState(false, e);
   }, options.debounce ?? 0);
 
   node.addEventListener('focusin', onFocus, { passive: true });
