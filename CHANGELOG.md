@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.21.1](https://github.com/dvcol/svelte-utils/compare/v1.21.0...v1.21.1) (2025-07-23)
+
+
+### Bug Fixes
+
+* **actions:** pass event to change listeners ([fe984fa](https://github.com/dvcol/svelte-utils/commit/fe984faa2e955ce8a632eb125cf40cc7e5b033ac))
+* **transition:** change default ([36264ca](https://github.com/dvcol/svelte-utils/commit/36264ca408f85cc79c72766b87243b0c91648810))
+
 ## [1.21.0](https://github.com/dvcol/svelte-utils/compare/v1.20.0...v1.21.0) (2025-07-17)
 
 
