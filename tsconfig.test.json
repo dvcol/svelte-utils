@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.build.json",
+  "compilerOptions": {
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node", "vitest/globals", "@testing-library/jest-dom"],
+    "noEmit": true
+  },
+  "include": [
+    "test/**/*.ts",
+    "src/**/*.test.ts",
+    "src/**/*.spec.ts"
+  ]
+}

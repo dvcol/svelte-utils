@@ -1,13 +1,15 @@
-import { type SwipeHandlers, type SwipeHooks, type SwipeNodeTolerances, useSwipe } from './touch.svelte.js';
-
 import type { ScrollState } from '@dvcol/common-utils/common/touch';
 import type { Action } from 'svelte/action';
 
-export type SwipeOptions = {
+import type { SwipeHandlers, SwipeHooks, SwipeNodeTolerances } from './touch.svelte.js';
+
+import { useSwipe } from './touch.svelte.js';
+
+export interface SwipeOptions {
   onSwipe: SwipeHooks['onSwipe'];
   tolerances?: SwipeNodeTolerances;
   scroll?: ScrollState;
-};
+}
 
 /**
  * Register touch events handler for swipe detection.

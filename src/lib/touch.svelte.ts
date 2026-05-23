@@ -1,18 +1,18 @@
-import { handleSwipe } from '@dvcol/common-utils/common/touch';
-
 import type { ScrollState, SwipeDirections, SwipeTolerances } from '@dvcol/common-utils/common/touch';
 import type { TouchEventHandler } from 'svelte/elements';
 
-export type SwipeHooks = {
+import { handleSwipe } from '@dvcol/common-utils/common/touch';
+
+export interface SwipeHooks {
   onSwipe?: (swipe: SwipeDirections) => void;
   onTouchStart?: TouchEventHandler<HTMLDivElement> | null;
   onTouchEnd?: TouchEventHandler<HTMLDivElement> | null;
-};
+}
 
-export type SwipeHandlers = {
+export interface SwipeHandlers {
   ontouchstart: TouchEventHandler<HTMLDivElement>;
   ontouchend: TouchEventHandler<HTMLDivElement>;
-};
+}
 
 export type SwipeNodeTolerances = {
   horizontal?: SwipeTolerances['horizontal'] | `${number}%`;
@@ -24,8 +24,8 @@ export type SwipeNodeTolerances = {
   container?: Element;
 } & Omit<SwipeTolerances, 'horizontal' | 'up' | 'down' | 'vertical' | 'left' | 'right'>;
 
-const percentRegex = /(\d+)%/;
-const toTolerances = ({ container, ...tolerances }: SwipeNodeTolerances = {}): SwipeTolerances | undefined => {
+const percentRegex = /\d+%/;
+function toTolerances({ container, ...tolerances }: SwipeNodeTolerances = {}): SwipeTolerances | undefined {
   if (!tolerances || !Object.keys(tolerances)?.length) return undefined;
   return Object.entries(tolerances).reduce<SwipeTolerances>((acc, [key, value]) => {
     if (typeof value === 'number') {
@@ -43,35 +43,35 @@ const toTolerances = ({ container, ...tolerances }: SwipeNodeTolerances = {}): S
     }
     return acc;
   }, {});
-};
+}
 
 /**
  * Register touch events handler for swipe detection.
- * @param onSwipe
- * @param onTouchStart
- * @param onTouchEnd
- * @param tolerances
- * @param scroll
+ * @param hooks - swipe lifecycle callbacks
+ * @param hooks.onSwipe - called when a swipe is detected
+ * @param hooks.onTouchStart - called on touchstart
+ * @param hooks.onTouchEnd - called on touchend
+ * @param tolerances - swipe distance/velocity thresholds
+ * @param scroll - scroll state to factor into swipe detection
  */
-export const useSwipe = (
-  { onSwipe, onTouchStart, onTouchEnd }: SwipeHooks = {},
-  tolerances?: SwipeNodeTolerances,
-  scroll?: ScrollState,
-): SwipeHandlers => {
+export function useSwipe({ onSwipe, onTouchStart, onTouchEnd }: SwipeHooks = {}, tolerances?: SwipeNodeTolerances, scroll?: ScrollState): SwipeHandlers {
   let scrollStart = $state({ x: window.scrollX, y: window.scrollY });
   let touchStart = $state<TouchEvent>();
 
   return {
-    ontouchstart: e => {
+    ontouchstart: (e) => {
       touchStart = e;
       scrollStart = { x: window.scrollX, y: window.scrollY };
-      return onTouchStart?.(e);
+      onTouchStart?.(e);
     },
-    ontouchend: e => {
+    ontouchend: (e) => {
       const start = touchStart?.targetTouches?.[0];
       const end = e.changedTouches?.[0];
 
-      if (!start || !end) return onTouchEnd?.(e);
+      if (!start || !end) {
+        onTouchEnd?.(e);
+        return;
+      }
 
       const swipe = handleSwipe(
         {
@@ -89,7 +89,7 @@ export const useSwipe = (
       if (swipe) onSwipe?.(swipe);
 
       touchStart = undefined;
-      return onTouchEnd?.(e);
+      onTouchEnd?.(e);
     },
   };
-};
+}

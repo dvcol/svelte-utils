@@ -1,10 +1,10 @@
 import type { Action } from 'svelte/action';
 
 type ResizeCallback = (entry: ResizeObserverEntry, index: number, entries: ResizeObserverEntry[]) => unknown;
-type ResizeOptions = {
+interface ResizeOptions {
   callback: ResizeCallback;
   options?: ResizeObserverOptions;
-};
+}
 
 const callbacks = new WeakMap<Element, ResizeCallback>();
 let observer: ResizeObserver;

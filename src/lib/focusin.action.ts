@@ -1,9 +1,9 @@
+import type { Action } from 'svelte/action';
+
 import { debounce } from '@dvcol/common-utils/common/debounce';
 import { getFocusableElement } from '@dvcol/common-utils/common/element';
 
-import type { Action } from 'svelte/action';
-
-export type FocusInOptions = {
+export interface FocusInOptions {
   /**
    * Whether the element is or contains a focused element.
    * @default false
@@ -28,7 +28,7 @@ export type FocusInOptions = {
    * @default 0
    */
   debounce?: number;
-};
+}
 export const focusin: Action<HTMLElement, FocusInOptions> = (node: HTMLElement, options: FocusInOptions) => {
   let params = options;
 

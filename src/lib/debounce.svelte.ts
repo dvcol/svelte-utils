@@ -15,7 +15,7 @@ export function debounced<T>(getter: () => T, delay = 0, cb?: (error: unknown) =
     current = v;
   }, delay);
   $effect(() => {
-    update(getter()).catch(cb);
+    void update(getter()).catch(cb);
   });
   return () => current;
 }

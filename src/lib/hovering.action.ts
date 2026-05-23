@@ -1,6 +1,6 @@
 import type { Action } from 'svelte/action';
 
-export type HoveringOptions = {
+export interface HoveringOptions {
   /**
    * Whether the element is hovered.
    * @default false
@@ -12,7 +12,7 @@ export type HoveringOptions = {
    * @param e - PointerEvent that triggered the change
    */
   onChange?: (value: boolean, e: PointerEvent) => void;
-};
+}
 export const hovering: Action<HTMLElement, HoveringOptions> = (node: HTMLElement, options: HoveringOptions) => {
   let params = options;
 

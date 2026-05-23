@@ -1,6 +1,6 @@
 import { tick, untrack } from 'svelte';
 
-export type WatchOptions = {
+export interface WatchOptions {
   /**
    * Run outside tracked scope.
    * @see https://svelte.dev/docs/svelte/$effect#$effect.root
@@ -28,28 +28,28 @@ export type WatchOptions = {
    * Whether to run the logic inside the tracked scope
    */
   tracked?: boolean;
-};
+}
 
-const wait = (options?: Pick<WatchOptions, 'next'>) => {
+function wait(options?: Pick<WatchOptions, 'next'>) {
   if (!options?.next) return;
-  tick().then(options.next);
-};
+  void tick().then(options.next);
+}
 
-const useUntil = (options?: Pick<WatchOptions, 'until'>) => {
+function useUntil(options?: Pick<WatchOptions, 'until'>) {
   let first = 0;
   return ({ skip = 0 }: WatchOptions = {}) => {
     if (skip <= first) return options?.until?.();
     first += 1;
     return skip <= first || options?.until?.();
   };
-};
+}
 
 /**
  * Create a function that wraps the logic to run when the sources change.
  *
  * If change returns a callback, it will run:
- *  * immediately before the effect re-runs
- *  * when the component is destroyed
+ *  immediately before the effect re-runs
+ *  when the component is destroyed
  * @see https://svelte.dev/docs/svelte/$effect
  *
  * @param change - logic to run when sources change
@@ -57,11 +57,7 @@ const useUntil = (options?: Pick<WatchOptions, 'until'>) => {
  * @param options - watch options to control the behavior
  * @param options.tracked - whether to run the logic inside a tracked scope (default: false with sources, true without)
  */
-export const useEffect = (
-  change: Parameters<typeof $effect>[0],
-  sources?: () => unknown,
-  { tracked = !sources, ...options }: Omit<WatchOptions, 'pre' | 'root'> = {},
-): Parameters<typeof $effect>[0] => {
+export function useEffect(change: Parameters<typeof $effect>[0], sources?: () => unknown, { tracked = !sources, ...options }: Omit<WatchOptions, 'pre' | 'root'> = {}): Parameters<typeof $effect>[0] {
   const until = useUntil(options);
   return () => {
     sources?.();
@@ -70,7 +66,7 @@ export const useEffect = (
     wait(options);
     return cb;
   };
-};
+}
 
 /**
  * Watch for changes in the sources and run the logic.
@@ -78,8 +74,8 @@ export const useEffect = (
  * Logic will run outside of the tracked scope if `sources` is provided or if `options.tracked` is explicitly false.
  *
  * If change returns a callback, it will run:
- *  * immediately before the effect re-runs
- *  * when the component is destroyed
+ *  immediately before the effect re-runs
+ *  when the component is destroyed
  * @see https://svelte.dev/docs/svelte/$effect
  *
  * @param change - logic to run when sources change
@@ -101,8 +97,8 @@ export function watch(change: Parameters<typeof $effect>[0], sources?: () => unk
  * Logic will run inside of the tracked scope unless `options.tracked` is explicitly false.
  *
  * If change returns a callback, it will run:
- *  * immediately before the effect re-runs
- *  * when the component is destroyed
+ *  immediately before the effect re-runs
+ *  when the component is destroyed
  * @see https://svelte.dev/docs/svelte/$effect
  *
  * @param change - logic to run when sources change
@@ -115,14 +111,14 @@ export function effect(change: Parameters<typeof $effect>[0], sources?: () => un
 
 /**
  * Watch for differences between two getters output and run the logic if they change.
- * @param outer - getter function to watch
- * @param inner - getter function to watch
- * @param input - logic to run when outer changes (only if different from inner)
- * @param output - logic to run when inner changes (only if different from outer)
+ * @param bindings - getters and effects to bind together
+ * @param bindings.outer - getter function to watch
+ * @param bindings.inner - getter function to watch
+ * @param bindings.input - logic to run when outer changes (only if different from inner)
+ * @param bindings.output - logic to run when inner changes (only if different from outer)
  * @param options - watch options
  */
-export const doubleBind = <T = unknown>(
-  {
+export function doubleBind<T = unknown>({
     outer,
     inner,
     input,
@@ -132,9 +128,7 @@ export const doubleBind = <T = unknown>(
     inner: () => T;
     input: Parameters<typeof $effect>[0];
     output: Parameters<typeof $effect>[0];
-  },
-  options?: WatchOptions,
-) => {
+  }, options?: WatchOptions) {
   watch(
     () => {
       if (outer() === inner()) return;
@@ -151,4 +145,4 @@ export const doubleBind = <T = unknown>(
     inner,
     options,
   );
-};
+}

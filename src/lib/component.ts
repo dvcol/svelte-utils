@@ -18,45 +18,42 @@ export type ComponentOrLazy<
   Bindings extends keyof Props | string = string,
 > = (AnyComponent<Props, Exports, Bindings> | LazyComponentImport<Props, Exports, Bindings>) & { _isLazyComponent?: boolean };
 
-export const isLazyComponent = <
+export function isLazyComponent<
   Props extends Record<string, any> = any,
   Exports extends Record<string, any> = any,
   Bindings extends keyof Props | string = string,
->(
-  component?: ComponentOrLazy<Props, Exports, Bindings>,
-): component is LazyComponentImport<Props, Exports, Bindings> =>
-  !!(
-    component &&
-    typeof component === 'function' &&
+>(component?: ComponentOrLazy<Props, Exports, Bindings>): component is LazyComponentImport<Props, Exports, Bindings> {
+  return !!(
+    component
+    && typeof component === 'function'
     // Wrapped with toLazyComponent
-    (component._isLazyComponent ||
+    && (component._isLazyComponent
       // Wrapped in async function
-      component.constructor.name === 'AsyncFunction' ||
+      || component.constructor.name === 'AsyncFunction'
       // Arrow function named as component
-      component.name === 'component')
+      || component.name === 'component')
   );
+}
 
 export type AnySnippet = Snippet<any>;
 
-export const isSnippet = <
+export function isSnippet<
   Props extends Record<string, any> = any,
   Exports extends Record<string, any> = any,
   Bindings extends keyof Props | string = string,
->(
-  componentOrSnippet: ComponentOrLazy<Props, Exports, Bindings> | AnySnippet,
-): componentOrSnippet is AnySnippet => componentOrSnippet?.length === 1;
+>(componentOrSnippet: ComponentOrLazy<Props, Exports, Bindings> | AnySnippet): componentOrSnippet is AnySnippet {
+  return componentOrSnippet?.length === 1;
+}
 
-export const toLazyComponent = <
+export function toLazyComponent<
   Props extends Record<string, any> = any,
   Exports extends Record<string, any> = any,
   Bindings extends keyof Props | string = string,
->(
-  fn: () => Promise<unknown>,
-): LazyComponentImport<Props, Exports, Bindings> => {
+>(fn: () => Promise<unknown>): LazyComponentImport<Props, Exports, Bindings> {
   const component = fn as LazyComponentImport<Props, Exports, Bindings>;
   component._isLazyComponent = true;
   return component;
-};
+}
 
 export function isSyncComponentOrSnippet<
   Props extends Record<string, any> = any,

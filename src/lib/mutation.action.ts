@@ -1,7 +1,7 @@
 import type { Action } from 'svelte/action';
 
 type MutationCallback = (entry: MutationRecord, index: number, entries: MutationRecord[]) => unknown;
-type MutationOptions = { callback: MutationCallback; options: MutationObserverInit };
+interface MutationOptions { callback: MutationCallback; options: MutationObserverInit }
 
 /**
  * Watch for mutations on an element.
@@ -24,7 +24,7 @@ export const mutation: Action<Element, MutationOptions | MutationCallback> = (no
     const cb = typeof options === 'function' ? options : options.callback;
     const opt = typeof options === 'function' ? { childList: true } : options.options;
 
-    observer = new MutationObserver(mutations => {
+    observer = new MutationObserver((mutations) => {
       mutations.forEach(cb);
     });
     observer.observe(node, opt);

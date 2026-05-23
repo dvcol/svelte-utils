@@ -1,16 +1,12 @@
 import { onDestroy } from 'svelte';
 
-export type WatchMediaResult = {
+export interface WatchMediaResult {
   media: MediaQueryList;
   matches: () => boolean;
   destroy: () => void;
-};
+}
 
-export const useWatchMedia = (
-  query: string,
-  callback?: (event: MediaQueryListEvent) => void,
-  options?: AddEventListenerOptions,
-): WatchMediaResult => {
+export function useWatchMedia(query: string, callback?: (event: MediaQueryListEvent) => void, options?: AddEventListenerOptions): WatchMediaResult {
   const media = window.matchMedia(query);
   let matches = $state(media.matches);
 
@@ -27,4 +23,4 @@ export const useWatchMedia = (
     matches: () => matches,
     destroy,
   };
-};
+}

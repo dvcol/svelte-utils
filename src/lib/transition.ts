@@ -1,7 +1,10 @@
+import type { AnimationConfig, FlipParams } from 'svelte/animate';
+import type { EasingFunction, FlyParams, ScaleParams, TransitionConfig } from 'svelte/transition';
+
 import { clamp } from '@dvcol/common-utils/common/math';
-import { type AnimationConfig, flip, type FlipParams } from 'svelte/animate';
+import { flip } from 'svelte/animate';
 import { cubicOut } from 'svelte/easing';
-import { type EasingFunction, type FlyParams, scale, type ScaleParams, slide, type TransitionConfig } from 'svelte/transition';
+import { scale, slide } from 'svelte/transition';
 
 export type TransitionProps = Record<string, any>;
 export type TransitionFunction<T extends TransitionProps | undefined = TransitionProps | undefined> = (
@@ -19,10 +22,10 @@ export type AnimationFunction<T extends AnimationProps | undefined = AnimationPr
 ) => AnimationConfig;
 export const emptyAnimation: AnimationFunction = () => ({});
 
-export type TransitionWithProps<
+export interface TransitionWithProps<
   T extends TransitionProps | undefined = TransitionProps,
   F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
-> = {
+> {
   /**
    * Transition function.
    */
@@ -31,9 +34,9 @@ export type TransitionWithProps<
    * Optional transition props.
    */
   props?: T;
-};
+}
 
-export type AnimationWithProps<T extends AnimationProps | undefined = AnimationProps> = {
+export interface AnimationWithProps<T extends AnimationProps | undefined = AnimationProps> {
   /**
    * Transition function.
    */
@@ -42,28 +45,28 @@ export type AnimationWithProps<T extends AnimationProps | undefined = AnimationP
    * Optional transition props.
    */
   props?: T;
-};
+}
 
-export type FreezeParams = {
+export interface FreezeParams {
   /**
    * If `true`, the element size (height or width) will be frozen during the transition.
    */
   freeze?: boolean | ((node: Element) => boolean);
-};
+}
 
-export type SkipParams = {
+export interface SkipParams {
   /**
    * If `true`, the transition will be skipped.
    */
   skip?: boolean | ((node: Element) => boolean);
-};
+}
 
-export type TransformParams = {
+export interface TransformParams {
   /**
    * Transform function to apply to the css after parsing.
    */
   transform?: (css: string, t: number, u: number) => string;
-};
+}
 
 export type BaseParams = {
   /**
@@ -82,31 +85,31 @@ export type BaseParams = {
    * Additional CSS to apply to the element during the transition.
    */
   css?: string;
-} & FreezeParams &
-  SkipParams;
+} & FreezeParams
+& SkipParams;
 
 /**
  * Parses a CSS property from a string to a number.
  * @param node - The element to parse the CSS property from.
  * @param css - The CSS property to parse.
  */
-export const parseCSSString = (node: Element, css: keyof CSSStyleDeclaration) => {
+export function parseCSSString(node: Element, css: keyof CSSStyleDeclaration) {
   if (!node) return 0;
   let value = getComputedStyle(node)[css];
   if (typeof value === 'number') return value;
   if (typeof value !== 'string') return 0;
   if (!value) return 0;
-  value = parseFloat(value);
+  value = Number.parseFloat(value);
   if (Number.isNaN(value)) return 0;
   return value;
-};
+}
 
-const evaluateFn = (value: boolean | BaseParams['skip'] | BaseParams['freeze'], node: Element) => {
+function evaluateFn(value: boolean | BaseParams['skip'] | BaseParams['freeze'], node: Element) {
   if (typeof value === 'function') return value(node);
   return value;
-};
+}
 
-export type OpacityParams = {
+export interface OpacityParams {
   /**
    * The opacity will be gradually increased (or decreased) over the duration of the transition.
    * The opacity will range from the current (or minimum) opacity to the provided minimum (or current).
@@ -114,25 +117,25 @@ export type OpacityParams = {
   opacity?:
     | boolean
     | {
-        /**
-         * Minimum opacity to respect (before entering, or after leaving)
-         * @default 0
-         */
-        minimum?: number;
-        /**
-         * Easing to use
-         * @default the parent transition easing
-         */
-        easing?: EasingFunction;
-      };
-};
+      /**
+       * Minimum opacity to respect (before entering, or after leaving)
+       * @default 0
+       */
+      minimum?: number;
+      /**
+       * Easing to use
+       * @default the parent transition easing
+       */
+      easing?: EasingFunction;
+    };
+}
 export type WidthParams = BaseParams & OpacityParams & TransformParams;
 
 const opacityRegex = /opacity: [0-9.]+;/;
-const replaceOpacity = (css: string, min: boolean | number = false, value: number) => {
+function replaceOpacity(css: string, min: boolean | number = false, value: number) {
   if (min === false) return css.replace(opacityRegex, '');
   return css.replace(opacityRegex, `opacity: ${clamp(value, typeof min === 'number' ? min : 0, 1)};`);
-};
+}
 
 export type HeightParams = BaseParams & OpacityParams & TransformParams;
 
@@ -141,7 +144,7 @@ export type HeightParams = BaseParams & OpacityParams & TransformParams;
  * If `freeze` is `true`, the width of the element will be frozen during the transition.
  * If `skip` is `true`, the transition will be skipped.
  * If `opacity` is a truthy, the opacity will be gradually increased or decreased over the duration.
- * @default { easing: x => x, freeze: true, skip: false }
+ * @default
  */
 export function height(
   node: Element,
@@ -173,7 +176,7 @@ export function height(
  * If `freeze` is `true`, the width of the element will be frozen during the transition.
  * If `skip` is `true`, the transition will be skipped.
  * If `opacity` is a number, the opacity will be gradually increased or decreased over the duration of the transition but never below the provided value.
- * @default { easing: x => x, freeze: true, skip: false }
+ * @default
  */
 export function width(
   node: Element,
@@ -210,20 +213,22 @@ export function composeTransition<T extends TransitionProps = TransitionProps>(.
       return use(node, { ...params, ...props }, options);
     });
 
+    const { delay = 0, duration = 400, easing = (x: number) => x, skip, transform } = (params ?? {}) as BaseParams & TransformParams;
+
     return {
-      delay: params.delay ?? 0,
-      duration: params.duration ?? 400,
-      easing: params.easing ?? (x => x),
+      delay,
+      duration,
+      easing,
       css: (t, u) => {
-        if (params.skip && evaluateFn(params.skip, node)) return '';
+        if (skip && evaluateFn(skip, node)) return '';
         const _css = _transitions
-          .map(transition => {
+          .map((transition) => {
             if (typeof transition === 'function') return transition().css?.(t, u);
             return transition.css?.(t, u);
           })
           .filter(Boolean)
           .join(';\n');
-        if (params.transform) return params.transform(_css, t, u);
+        if (transform) return transform(_css, t, u);
         return _css;
       },
     };
@@ -236,7 +241,7 @@ export type ScaleFreezeParams = BaseParams & ScaleParams;
  * Animates the opacity and scale of an element.
  * `in` transitions animate from an element's current (default) values to the provided values, passed as parameters.
  * `out` transitions animate from the provided values to an element's default values.
- * @default { duration: 400, start: 0.95, freeze: true }
+ * @default
  */
 export function scaleFreeze(
   node: Element,
@@ -245,10 +250,10 @@ export function scaleFreeze(
 ): TransitionConfig {
   const { delay, easing, css: scaleCss } = scale(node, { duration, start, ...params });
 
-  let _height = parseFloat(getComputedStyle(node).height);
+  let _height = Number.parseFloat(getComputedStyle(node).height);
   if (!_height || Number.isNaN(_height)) _height = 0;
 
-  let _width = parseFloat(getComputedStyle(node).width);
+  let _width = Number.parseFloat(getComputedStyle(node).width);
   if (!_width || Number.isNaN(_width)) _width = 0;
 
   return {
@@ -262,12 +267,12 @@ export function scaleFreeze(
   };
 }
 
-export type ScaleWidthParams = BaseParams &
-  ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; width?: Omit<WidthParams, 'duration' | 'delay' | 'easing'> };
+export type ScaleWidthParams = BaseParams
+  & ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; width?: Omit<WidthParams, 'duration' | 'delay' | 'easing'> };
 
 /**
  * Combines the `width` and `scale` transitions to animate the width of an element.
- * @default { duration: 400, start: 0.95 }
+ * @default
  */
 export function scaleWidth(
   node: Element,
@@ -287,12 +292,12 @@ export function scaleWidth(
   };
 }
 
-export type ScaleHeightParams = BaseParams &
-  ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; height?: Omit<HeightParams, 'duration' | 'delay' | 'easing'> };
+export type ScaleHeightParams = BaseParams
+  & ScaleParams & { scale?: Omit<ScaleParams, 'duration' | 'delay' | 'easing'>; height?: Omit<HeightParams, 'duration' | 'delay' | 'easing'> };
 
 /**
  * Combines the `height` and `scale` transitions to animate the height of an element.
- * @default { duration: 400, start: 0.95 }
+ * @default
  */
 export function scaleHeight(
   node: Element,
@@ -316,9 +321,9 @@ export type FlipToggleParams = FlipParams & SkipParams;
 export const flipToggle: AnimationFunction<FlipToggleParams> = (node, directions, { skip, ...params } = {}) =>
   evaluateFn(skip, node) ? {} : flip(node, directions, params);
 
-type FlyUnit = { value: number; unit: string };
+interface FlyUnit { value: number; unit: string }
 type FlyValue = number | string | FlyUnit;
-const regexCssUnit = /^\s*(-?[\d.]+)(\S*)\s*$/;
+const regexCssUnit = /^\s*(-?[\d.]+)([a-z%]*)\s*$/i;
 
 function splitCssUnit(value: FlyValue): FlyUnit {
   if (typeof value === 'object') return value;
