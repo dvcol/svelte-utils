@@ -1,9 +1,9 @@
 import type { ScrollState } from '@dvcol/common-utils/common/touch';
 import type { Action } from 'svelte/action';
 
-import type { SwipeHandlers, SwipeHooks, SwipeNodeTolerances } from './touch.svelte.js';
+import type { SwipeHandlers, SwipeHooks, SwipeNodeTolerances } from './rune.svelte.js';
 
-import { useSwipe } from './touch.svelte.js';
+import { useSwipe } from './rune.svelte.js';
 
 export interface SwipeOptions {
   onSwipe: SwipeHooks['onSwipe'];
