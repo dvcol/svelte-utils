@@ -7,11 +7,18 @@ import {
   flipToggle,
   flyFrom,
   height,
+  isTransitionWithProps,
+  isWithProps,
   parseCSSString,
   scaleFreeze,
   scaleHeight,
   scaleValue,
   scaleWidth,
+  toAnimation,
+  toTransition,
+  toTransitionProps,
+  unwrap,
+  unwrapProps,
   width,
 } from '~/transitions/transition.js';
 
@@ -121,6 +128,154 @@ describe('transition', () => {
       expect.assertions(1);
       const fn = scaleValue(0.5);
       expect(fn(0.5, 0.5)).toMatch(/scale\(/);
+    });
+  });
+
+  describe('isWithProps', () => {
+    it('narrows wrapper objects', () => {
+      expect.assertions(1);
+      expect(isWithProps({ use: () => ({}) })).toBe(true);
+    });
+
+    it('rejects bare callables', () => {
+      expect.assertions(1);
+      expect(isWithProps(() => ({}))).toBe(false);
+    });
+
+    it('rejects wrappers whose use is undefined', () => {
+      expect.assertions(1);
+      expect(isWithProps({ use: undefined } as unknown as { use: () => void })).toBe(false);
+    });
+
+    it('rejects nullish and non-object inputs', () => {
+      expect.assertions(3);
+      expect(isWithProps(undefined)).toBe(false);
+      expect(isWithProps(null as unknown as undefined)).toBe(false);
+      expect(isWithProps(42 as unknown as undefined)).toBe(false);
+    });
+  });
+
+  describe('unwrap', () => {
+    it('returns use from a wrapper', () => {
+      expect.assertions(1);
+      const fn = () => ({});
+      expect(unwrap({ use: fn })).toBe(fn);
+    });
+
+    it('passes bare callables through', () => {
+      expect.assertions(1);
+      const fn = () => ({});
+      expect(unwrap(fn)).toBe(fn);
+    });
+
+    it('returns fallback for undefined', () => {
+      expect.assertions(1);
+      const fallback = () => ({});
+      expect(unwrap(undefined, fallback)).toBe(fallback);
+    });
+
+    it('returns undefined when no fallback is provided', () => {
+      expect.assertions(1);
+      expect(unwrap(undefined)).toBeUndefined();
+    });
+  });
+
+  describe('unwrapProps', () => {
+    it('returns props from wrapper', () => {
+      expect.assertions(1);
+      const props = { foo: 'bar' };
+      expect(unwrapProps({ use: () => ({}), props })).toBe(props);
+    });
+
+    it('returns fallback for bare callable', () => {
+      expect.assertions(1);
+      const fallback = { foo: 'bar' };
+      expect(unwrapProps(() => ({}), fallback)).toBe(fallback);
+    });
+
+    it('returns fallback for undefined', () => {
+      expect.assertions(1);
+      const fallback = { foo: 'bar' };
+      expect(unwrapProps(undefined, fallback)).toBe(fallback);
+    });
+  });
+
+  describe('isTransitionWithProps', () => {
+    it('returns true for a transition wrapper', () => {
+      expect.assertions(1);
+      expect(isTransitionWithProps({ use: emptyTransition })).toBe(true);
+    });
+
+    it('returns false for a bare transition', () => {
+      expect.assertions(1);
+      expect(isTransitionWithProps(emptyTransition)).toBe(false);
+    });
+  });
+
+  describe('toTransition', () => {
+    it('unwraps a wrapper', () => {
+      expect.assertions(1);
+      const fn = emptyTransition;
+      expect(toTransition({ use: fn })).toBe(fn);
+    });
+
+    it('passes a bare function through', () => {
+      expect.assertions(1);
+      expect(toTransition(emptyTransition)).toBe(emptyTransition);
+    });
+
+    it('falls back to emptyTransition for undefined', () => {
+      expect.assertions(1);
+      expect(toTransition(undefined)).toBe(emptyTransition);
+    });
+
+    it('honours a custom fallback', () => {
+      expect.assertions(1);
+      const fallback = emptyTransition;
+      expect(toTransition(undefined, fallback)).toBe(fallback);
+    });
+  });
+
+  describe('toAnimation', () => {
+    it('unwraps a wrapper', () => {
+      expect.assertions(1);
+      expect(toAnimation({ use: emptyAnimation })).toBe(emptyAnimation);
+    });
+
+    it('passes a bare function through', () => {
+      expect.assertions(1);
+      expect(toAnimation(emptyAnimation)).toBe(emptyAnimation);
+    });
+
+    it('falls back to emptyAnimation for undefined', () => {
+      expect.assertions(1);
+      expect(toAnimation(undefined)).toBe(emptyAnimation);
+    });
+
+    it('honours a custom fallback', () => {
+      expect.assertions(1);
+      const fallback = emptyAnimation;
+      expect(toAnimation(undefined, fallback)).toBe(fallback);
+    });
+  });
+
+  describe('toTransitionProps', () => {
+    it('returns props from wrapper', () => {
+      expect.assertions(1);
+      const props = { duration: 200 };
+      expect(toTransitionProps({ use: emptyTransition, props })).toBe(props);
+    });
+
+    it('returns fallback for bare transition', () => {
+      expect.assertions(1);
+      const fallback = { duration: 200 };
+      expect(toTransitionProps(emptyTransition, fallback)).toBe(fallback);
+    });
+
+    it('returns fallback for undefined', () => {
+      expect.assertions(1);
+      const fallback = { duration: 200 };
+      expect(toTransitionProps(undefined, fallback)).toBe(fallback);
     });
   });
 });

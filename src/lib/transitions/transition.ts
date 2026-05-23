@@ -22,29 +22,96 @@ export type AnimationFunction<T extends AnimationProps | undefined = AnimationPr
 ) => AnimationConfig;
 export const emptyAnimation: AnimationFunction = () => ({});
 
-export interface TransitionWithProps<
-  T extends TransitionProps | undefined = TransitionProps,
-  F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
-> {
-  /**
-   * Transition function.
-   */
+/**
+ * Wrapper bag pairing a callable (transition / animation / attachment factory)
+ * with its props. The same `{ use, props? }` shape that
+ * [[TransitionWithProps]] and [[AnimationWithProps]] follow.
+ */
+export interface WithProps<F, T = unknown> {
+  /** The wrapped callable. */
   use: F;
-  /**
-   * Optional transition props.
-   */
+  /** Optional props passed to consumers of `use`. */
   props?: T;
 }
 
-export interface AnimationWithProps<T extends AnimationProps | undefined = AnimationProps> {
-  /**
-   * Transition function.
-   */
-  use: AnimationFunction<T>;
-  /**
-   * Optional transition props.
-   */
-  props?: T;
+/** Type guard narrowing a value to the {@link WithProps} wrapper form. */
+export function isWithProps<F, T = unknown>(
+  value: F | WithProps<F, T> | undefined,
+): value is WithProps<F, T> {
+  return !!value && typeof value === 'object' && 'use' in value && value.use !== undefined;
+}
+
+/**
+ * Unwrap a `{ use, props }` wrapper or pass a bare callable through.
+ * Returns `fallback` when `value` is undefined.
+ */
+export function unwrap<F, T = unknown>(
+  value: F | WithProps<F, T> | undefined,
+  fallback?: F,
+): F | undefined {
+  if (!value) return fallback;
+  if (isWithProps<F, T>(value)) return value.use;
+  return value;
+}
+
+/**
+ * Read `.props` off a {@link WithProps} wrapper, returning `fallback` for
+ * bare callables and `undefined` inputs.
+ */
+export function unwrapProps<F, T = unknown>(
+  value: F | WithProps<F, T> | undefined,
+  fallback?: T,
+): T | undefined {
+  if (!value) return fallback;
+  if (isWithProps<F, T>(value)) return value.props ?? fallback;
+  return fallback;
+}
+
+export type TransitionWithProps<
+  T extends TransitionProps | undefined = TransitionProps,
+  F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
+> = WithProps<F, T>;
+
+export type AnimationWithProps<T extends AnimationProps | undefined = AnimationProps> = WithProps<AnimationFunction<T>, T>;
+
+/** Type guard for a {@link TransitionWithProps} or {@link AnimationWithProps}. */
+export function isTransitionWithProps<
+  T extends TransitionProps | undefined = TransitionProps,
+  F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
+>(value: F | WithProps<F, T> | undefined): value is WithProps<F, T> {
+  return isWithProps<F, T>(value);
+}
+
+/**
+ * Normalise a transition input to a plain {@link TransitionFunction}.
+ * Accepts a bare function, a {@link TransitionWithProps} wrapper, or
+ * `undefined` (falling back to `emptyTransition`).
+ */
+export function toTransition<T extends TransitionProps | undefined = TransitionProps>(
+  transition?: TransitionFunction<T> | TransitionWithProps<T>,
+  fallback: TransitionFunction<T> = emptyTransition,
+): TransitionFunction<T> {
+  return unwrap<TransitionFunction<T>, T>(transition, fallback) ?? fallback;
+}
+
+/**
+ * Normalise an animation input to a plain {@link AnimationFunction}.
+ * Accepts a bare function, an {@link AnimationWithProps} wrapper, or
+ * `undefined` (falling back to `emptyAnimation`).
+ */
+export function toAnimation<T extends AnimationProps | undefined = AnimationProps>(
+  animation?: AnimationFunction<T> | AnimationWithProps<T>,
+  fallback: AnimationFunction<T> = emptyAnimation,
+): AnimationFunction<T> {
+  return unwrap<AnimationFunction<T>, T>(animation, fallback) ?? fallback;
+}
+
+/** Read `.props` off a transition/animation wrapper, falling back for bare callables. */
+export function toTransitionProps<
+  T extends TransitionProps | undefined = TransitionProps,
+  F extends TransitionFunction<T> | AnimationFunction<T> = TransitionFunction<T>,
+>(transition?: F | WithProps<F, T>, fallback?: T): T | undefined {
+  return unwrapProps<F, T>(transition, fallback);
 }
 
 export interface FreezeParams {
