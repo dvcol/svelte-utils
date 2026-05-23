@@ -1,3 +1,4 @@
+import { flushSync } from 'svelte';
 import { describe, expect, it } from 'vitest';
 
 import { useMutation } from '~/mutation/attachment.svelte.js';
@@ -66,6 +67,49 @@ describe('useMutation', () => {
 
       void nextMutation().then(() => {
         try {
+          expect(mutation.records.length).toBeGreaterThan(0);
+        } finally {
+          unmount();
+          resolved();
+        }
+      });
+    });
+
+    await done;
+    cleanup();
+  });
+
+  it('re-creates the observer when an option getter changes', async () => {
+    expect.assertions(2);
+    let resolved!: () => void;
+    const done = new Promise<void>((res) => {
+      resolved = res;
+    });
+
+    const cleanup = $effect.root(() => {
+      let attributes = $state(false);
+      const mutation = useMutation({
+        childList: true,
+        get attributes() {
+          return attributes;
+        },
+      });
+      const { node, unmount } = mountAttachment<HTMLElement>(mutation.observe);
+
+      // Initial config: attributes off — mutating an attribute should not record.
+      node.setAttribute('data-test', '1');
+
+      void nextMutation().then(async () => {
+        try {
+          expect(mutation.records.length).toBe(0);
+
+          // Toggle option → observer is re-created with attributes: true.
+          attributes = true;
+          flushSync();
+
+          node.setAttribute('data-test', '2');
+          await nextMutation();
+
           expect(mutation.records.length).toBeGreaterThan(0);
         } finally {
           unmount();

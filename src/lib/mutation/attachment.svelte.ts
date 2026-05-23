@@ -12,6 +12,21 @@ const defaultOptions: MutationObserverInit = { childList: true };
  * - `records` is the latest batch of `MutationRecord`s.
  * - `current` is `records[0]` (most recent record in the batch).
  *
+ * ## Reactive options
+ *
+ * Option fields are read via spread inside the `$effect`, so any enumerable
+ * getter is tracked. Passing `{ get attributes(){…} }` disconnects and
+ * re-creates the observer with the new options when the source changes.
+ * Only own enumerable properties are read — keep options as a plain object
+ * literal.
+ *
+ * ## Design note — no `createSubscriber`
+ *
+ * Observer attachments are mount-driven, not read-driven — the observer
+ * must run while the node is attached, regardless of whether `.records` is
+ * currently being read in a tracked scope. A subscriber-gated observer
+ * would risk teardown / re-create on read flicker between renders.
+ *
  * @example
  * ```svelte
  * <script lang="ts">
@@ -25,11 +40,14 @@ export function useMutation(options: MutationOptions = defaultOptions): UseMutat
   let records = $state<MutationRecord[]>([]);
 
   const observe: Attachment<Element> = (node) => {
-    const observer = new MutationObserver((mutations) => {
-      records = mutations;
+    $effect(() => {
+      const init = { ...options };
+      const observer = new MutationObserver((mutations) => {
+        records = mutations;
+      });
+      observer.observe(node, init);
+      return () => observer.disconnect();
     });
-    observer.observe(node, options);
-    return () => observer.disconnect();
   };
 
   return {

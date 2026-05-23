@@ -74,6 +74,11 @@
       "types": "./dist/hovering/index.d.ts",
       "svelte": "./dist/hovering/index.js",
       "import": "./dist/hovering/index.js"
+    },
+    "./intersection": {
+      "types": "./dist/intersection/index.d.ts",
+      "svelte": "./dist/intersection/index.js",
+      "import": "./dist/intersection/index.js"
     }
   },
   "main": "./dist/index.js",

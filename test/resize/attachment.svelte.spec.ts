@@ -1,4 +1,5 @@
-import { describe, expect, it } from 'vitest';
+import { flushSync } from 'svelte';
+import { describe, expect, it, vi } from 'vitest';
 
 import { useResize } from '~/resize/attachment.svelte.js';
 import { listeners } from '~/resize/shared.js';
@@ -60,6 +61,33 @@ describe('useResize', () => {
 
       expect(instance.observed.has(node)).toBe(false);
       expect(listeners.get(node)).toBeUndefined();
+    });
+    cleanup();
+  });
+
+  it('re-observes when an option getter changes', () => {
+    expect.assertions(2);
+    const cleanup = $effect.root(() => {
+      let box = $state<ResizeObserverBoxOptions>('content-box');
+      const resize = useResize({
+        get box() {
+          return box;
+        },
+      });
+      const { node, unmount } = mountAttachment<HTMLElement>(resize.observe);
+
+      const instance = Mock.instances.at(-1)!;
+      const observeSpy = vi.spyOn(instance, 'observe');
+
+      box = 'border-box';
+      flushSync();
+
+      expect(observeSpy).toHaveBeenCalled();
+      const lastCall = observeSpy.mock.calls.at(-1)!;
+      expect(lastCall[1]).toEqual({ box: 'border-box' });
+      void node;
+
+      unmount();
     });
     cleanup();
   });
