@@ -113,7 +113,7 @@
     "access": "public"
   },
   "peerDependencies": {
-    "svelte": ">=5"
+    "svelte": ">=5.29"
   },
   "dependencies": {
     "@dvcol/common-utils": "^1.34.0",

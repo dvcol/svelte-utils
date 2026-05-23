@@ -1,26 +1,27 @@
-import { onDestroy } from 'svelte';
+import type { UseMedia } from './types.js';
 
-export interface WatchMediaResult {
-  media: MediaQueryList;
-  matches: () => boolean;
-  destroy: () => void;
-}
+import { MediaQuery } from 'svelte/reactivity';
 
-export function useWatchMedia(query: string, callback?: (event: MediaQueryListEvent) => void, options?: AddEventListenerOptions): WatchMediaResult {
-  const media = window.matchMedia(query);
-  let matches = $state(media.matches);
-
-  const listener = (event: MediaQueryListEvent) => {
-    matches = event.matches;
-    callback?.(event);
-  };
-  media.addEventListener('change', listener, options);
-  const destroy = () => media.removeEventListener('change', listener, options);
-
-  onDestroy(() => destroy());
+/**
+ * Reactive media query.
+ *
+ * Thin wrapper over `svelte/reactivity`'s `MediaQuery`. Returns `{ current }`
+ * — read inside an effect, derived, or template to subscribe to changes.
+ *
+ * @example
+ * ```svelte
+ * <script lang="ts">
+ *   const wide = useMedia('(min-width: 800px)');
+ * </script>
+ *
+ * <h1>{wide.current ? 'large' : 'small'}</h1>
+ * ```
+ */
+export function useMedia(query: string, fallback?: boolean): UseMedia {
+  const media = new MediaQuery(query, fallback);
   return {
-    media,
-    matches: () => matches,
-    destroy,
+    get current() {
+      return media.current;
+    },
   };
 }

@@ -1,1 +1,2 @@
-export * from './action.js';
+export * from './attachment.svelte.js';
+export type * from './types.js';
