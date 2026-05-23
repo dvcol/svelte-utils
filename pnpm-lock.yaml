@@ -16,7 +16,7 @@ importers:
         specifier: ^1.34.0
         version: 1.34.0
       svelte:
-        specifier: ^5.55.0
+        specifier: ^5.55.7
         version: 5.55.7(@typescript-eslint/types@8.59.3)
     devDependencies:
       '@commitlint/cli':

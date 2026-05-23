@@ -17,17 +17,17 @@ describe('debounced', () => {
     let source = $state(0);
 
     const cleanup = $effect.root(() => {
-      const get = debounced(() => source, 100);
+      const d = debounced({ value: () => source, delay: 100 });
       flushSync();
 
-      expect(get()).toBeUndefined();
+      expect(d.current).toBeUndefined();
 
       source = 1;
       flushSync();
       vi.advanceTimersByTime(100);
       flushSync();
 
-      expect(get()).toBe(1);
+      expect(d.current).toBe(1);
     });
     cleanup();
   });
@@ -37,7 +37,7 @@ describe('debounced', () => {
     let source = $state(0);
 
     const cleanup = $effect.root(() => {
-      const get = debounced(() => source, 50);
+      const d = debounced({ value: () => source, delay: 50 });
       flushSync();
 
       source = 1;
@@ -51,7 +51,61 @@ describe('debounced', () => {
       vi.advanceTimersByTime(60);
       flushSync();
 
-      expect(get()).toBe(3);
+      expect(d.current).toBe(3);
+    });
+    cleanup();
+  });
+
+  it('defaults to a 0ms delay when delay is omitted', () => {
+    expect.assertions(2);
+    let source = $state(0);
+
+    const cleanup = $effect.root(() => {
+      const d = debounced({ value: () => source });
+      flushSync();
+
+      expect(d.current).toBeUndefined();
+
+      source = 1;
+      flushSync();
+      vi.advanceTimersByTime(0);
+      flushSync();
+
+      expect(d.current).toBe(1);
+    });
+    cleanup();
+  });
+
+  it('reacts to a getter delay — changing it restarts the debounce', () => {
+    expect.assertions(3);
+    let source = $state(0);
+    let delay = $state(100);
+
+    const cleanup = $effect.root(() => {
+      const d = debounced({
+        value: () => source,
+        get delay() {
+          return delay;
+        },
+      });
+      flushSync();
+
+      source = 1;
+      flushSync();
+      vi.advanceTimersByTime(50);
+
+      delay = 200;
+      flushSync();
+      vi.advanceTimersByTime(100);
+      flushSync();
+
+      expect(d.current).toBeUndefined();
+
+      vi.advanceTimersByTime(100);
+      flushSync();
+
+      expect(d.current).toBe(1);
+      expect(d.error).toBeUndefined();
     });
     cleanup();
   });
