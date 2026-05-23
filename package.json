@@ -1,7 +1,7 @@
 {
   "name": "@dvcol/svelte-utils",
   "type": "module",
-  "version": "3.0.0",
+  "version": "3.1.0",
   "packageManager": "pnpm@11.2.2",
   "description": "Svelte library for common utility functions and constants",
   "author": "dvcol",

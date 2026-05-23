@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.1.0](https://github.com/dvcol/svelte-utils/compare/v3.0.0...v3.1.0) (2026-05-23)
+
+
+### Features
+
+* **debounce:** rework debounced to options object with reactive error state ([476ca7d](https://github.com/dvcol/svelte-utils/commit/476ca7d232c231e8f4028e9fc750e3b0b58325fc))
+
 ## [3.0.0](https://github.com/dvcol/svelte-utils/compare/v1.21.1...v3.0.0) (2026-05-23)
 
 
