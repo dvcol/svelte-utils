@@ -11,11 +11,17 @@ import { debounce } from '@dvcol/common-utils/common/debounce';
  */
 export function debounced<T>(getter: () => T, delay = 0, cb?: (error: unknown) => void): () => T | undefined {
   let current = $state<T>();
-  const update = debounce((v: T) => {
-    current = v;
-  }, delay);
+  const update = debounce(
+    (v: T) => {
+      current = v;
+    },
+    delay,
+  );
   $effect(() => {
-    void update(getter()).catch(cb);
+    update(getter()).catch(error => cb?.(error));
+    return () => {
+      void update.cancel();
+    };
   });
   return () => current;
 }

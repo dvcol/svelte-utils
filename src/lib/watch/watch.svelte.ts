@@ -30,9 +30,14 @@ export interface WatchOptions {
   tracked?: boolean;
 }
 
-function wait(options?: Pick<WatchOptions, 'next'>) {
+function wait(options?: Pick<WatchOptions, 'next'>): AbortController | undefined {
   if (!options?.next) return;
-  void tick().then(options.next);
+  const controller = new AbortController();
+  void tick().then(() => {
+    if (controller.signal.aborted) return;
+    options.next?.();
+  });
+  return controller;
 }
 
 function useUntil(options?: Pick<WatchOptions, 'until'>) {
@@ -63,8 +68,11 @@ export function useEffect(change: Parameters<typeof $effect>[0], sources?: () =>
     sources?.();
     if (until(options)) return;
     const cb = tracked ? change() : untrack(change);
-    wait(options);
-    return cb;
+    const pending = wait(options);
+    return () => {
+      pending?.abort();
+      cb?.();
+    };
   };
 }
 

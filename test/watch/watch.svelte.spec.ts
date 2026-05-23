@@ -1,4 +1,4 @@
-import { flushSync } from 'svelte';
+import { flushSync, tick } from 'svelte';
 import { describe, expect, it, vi } from 'vitest';
 
 import { doubleBind, effect, useEffect, watch } from '~/watch/watch.svelte.js';
@@ -18,6 +18,38 @@ describe('watch utilities', () => {
 
       expect(change).not.toHaveBeenCalled();
       cleanup();
+    });
+
+    it('runs next() on the following tick', async () => {
+      expect.assertions(1);
+      const next = vi.fn();
+      const value = $state(0);
+      const fn = useEffect(() => {}, () => value, { next });
+
+      const cleanup = $effect.root(() => {
+        $effect(fn);
+        flushSync();
+      });
+
+      await tick();
+      expect(next).toHaveBeenCalled();
+      cleanup();
+    });
+
+    it('skips next() when the effect re-runs before tick resolves', async () => {
+      expect.assertions(1);
+      const next = vi.fn();
+      const value = $state(0);
+      const fn = useEffect(() => {}, () => value, { next });
+
+      const cleanup = $effect.root(() => {
+        $effect(fn);
+        flushSync();
+      });
+      cleanup();
+
+      await tick();
+      expect(next).not.toHaveBeenCalled();
     });
 
     it('runs the change callback when sources change', () => {
