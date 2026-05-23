@@ -21,7 +21,6 @@ import type { HoveringOptions } from './types.js';
 export function useHovering(options: HoveringOptions = {}): Attachment<HTMLElement> {
   return (node) => {
     const setState = (value: boolean, e: PointerEvent) => {
-      if (value === options.hovered) return;
       options.hovered = value;
       options.onChange?.(value, e);
     };

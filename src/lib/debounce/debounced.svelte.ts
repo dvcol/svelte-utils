@@ -18,6 +18,7 @@ export function debounced<T>(getter: () => T, delay = 0, cb?: (error: unknown) =
     delay,
   );
   $effect(() => {
+    /* v8 ignore next -- defensive catch; the debounced setter can't reject */
     update(getter()).catch(error => cb?.(error));
     return () => {
       void update.cancel();

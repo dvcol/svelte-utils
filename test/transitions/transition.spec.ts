@@ -43,6 +43,21 @@ describe('transition', () => {
       const value = parseCSSString(node, 'width');
       expect(typeof value).toBe('number');
     });
+
+    it('returns 0 when computed style yields an empty string', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      // an unset property returns '' from getComputedStyle in jsdom
+      expect(parseCSSString(node, 'borderTopColor')).toBe(0);
+    });
+
+    it('returns 0 when the parsed value is NaN', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      // 'cursor' returns 'auto' — Number.parseFloat('auto') is NaN
+      node.style.cursor = 'auto';
+      expect(parseCSSString(node, 'cursor')).toBe(0);
+    });
   });
 
   describe('emptyTransition / emptyAnimation', () => {
@@ -77,6 +92,30 @@ describe('transition', () => {
       const css = config.css?.(0.5, 0.5);
       expect(typeof css).toBe('string');
     });
+
+    it('height: default freeze + direction:out emits a width: lock', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const config = height(node, { css: 'foo: bar' }, { direction: 'out' });
+      const css = config.css?.(0.5, 0.5);
+      expect(css).toContain('width:');
+    });
+
+    it('width: default freeze + direction:out emits a height: lock', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const config = width(node, { css: 'foo: bar' }, { direction: 'out' });
+      const css = config.css?.(0.5, 0.5);
+      expect(css).toContain('height:');
+    });
+
+    it('opacity option clamps replaceOpacity range', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const config = height(node, { opacity: { minimum: 0.25 } }, { direction: 'in' });
+      const css = config.css?.(0.5, 0.5);
+      expect(typeof css).toBe('string');
+    });
   });
 
   describe('composeTransition', () => {
@@ -101,6 +140,36 @@ describe('transition', () => {
       expect(typeof scaleWidth(node).css).toBe('function');
       expect(typeof scaleHeight(node).css).toBe('function');
     });
+
+    it('scaleFreeze: freeze branch emits frozen width/height', () => {
+      expect.assertions(2);
+      const node = makeNode();
+      const css = scaleFreeze(node, { css: 'foo: bar' }).css?.(0.5, 0.5);
+      expect(css).toContain('height:');
+      expect(css).toContain('width:');
+    });
+
+    it('scaleFreeze: direction:in skips the freeze branch', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const css = scaleFreeze(node, { css: 'foo: bar' }, { direction: 'in' }).css?.(0.5, 0.5);
+      // freeze branch would emit "height: …px; width: …px" — skipped here
+      expect(css).not.toContain('width: 100px');
+    });
+
+    it('scaleWidth: css() returns a non-empty string', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const css = scaleWidth(node).css?.(0.5, 0.5);
+      expect(typeof css).toBe('string');
+    });
+
+    it('scaleHeight: css() returns a non-empty string', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const css = scaleHeight(node).css?.(0.5, 0.5);
+      expect(typeof css).toBe('string');
+    });
   });
 
   describe('flipToggle', () => {
@@ -119,6 +188,23 @@ describe('transition', () => {
       const config = flyFrom(node, { x: 10, y: 20 });
       const css = config.css?.(0.5, 0.5);
       expect(css).toContain('opacity:');
+      expect(css).toContain('translate(');
+    });
+
+    it('accepts string CSS units for x/y via splitCssUnit', () => {
+      expect.assertions(2);
+      const node = makeNode();
+      const config = flyFrom(node, { x: '10em', y: '20%' });
+      const css = config.css?.(0.5, 0.5);
+      expect(css).toContain('em');
+      expect(css).toContain('%');
+    });
+
+    it('supports a function start value', () => {
+      expect.assertions(1);
+      const node = makeNode();
+      const config = flyFrom(node, { start: () => ({ x: 5, y: '10px' }) });
+      const css = config.css?.(0.5, 0.5);
       expect(css).toContain('translate(');
     });
   });

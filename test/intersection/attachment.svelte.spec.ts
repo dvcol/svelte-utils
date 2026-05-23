@@ -122,6 +122,25 @@ describe('useIntersection', () => {
     cleanup();
   });
 
+  it('keeps current entry when batch is empty', () => {
+    expect.assertions(2);
+    const cleanup = $effect.root(() => {
+      const intersection = useIntersection();
+      const { node, unmount } = mountAttachment<HTMLElement>(intersection.observe);
+
+      const instance = Mock.instances.at(-1)!;
+      const first = entry(node, true);
+      instance.trigger([first]);
+      expect(intersection.current).toStrictEqual(first);
+
+      instance.trigger([]);
+      expect(intersection.current).toStrictEqual(first);
+
+      unmount();
+    });
+    cleanup();
+  });
+
   it('drops node visibility/entry on unmount', () => {
     expect.assertions(2);
     const cleanup = $effect.root(() => {

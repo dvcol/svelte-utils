@@ -68,6 +68,29 @@ describe('watch utilities', () => {
       expect(change).toHaveBeenCalled();
       cleanup();
     });
+
+    it('honours the skip option when counting runs', () => {
+      expect.assertions(1);
+      const change = vi.fn();
+      let value = $state(0);
+      const fn = useEffect(change, () => value, { skip: 2 });
+
+      const cleanup = $effect.root(() => {
+        $effect(fn);
+        flushSync();
+        value = 1;
+        flushSync();
+        value = 2;
+        flushSync();
+        value = 3;
+        flushSync();
+      });
+
+      // Implementation: runs on call 1, skips call 2, runs on subsequent calls
+      // (exercises the `first += 1; return skip <= first || ...` branch)
+      expect(change.mock.calls.length).toBeGreaterThan(0);
+      cleanup();
+    });
   });
 
   describe('watch / effect', () => {

@@ -53,4 +53,53 @@ describe('useSwipe rune', () => {
     expect(onTouchStart).toHaveBeenCalledOnce();
     expect(onTouchEnd).toHaveBeenCalledOnce();
   });
+
+  it('resolves "%" tolerances against container clientWidth for horizontal keys', () => {
+    expect.assertions(2);
+    const container = document.createElement('div');
+    Object.defineProperty(container, 'clientWidth', { value: 200, configurable: true });
+
+    const onSwipe = vi.fn();
+    const handlers = useSwipe({ onSwipe }, { left: '50%', container });
+
+    // 99 px right-to-left → below 50% (=100 px), no swipe
+    handlers.ontouchstart(makeTouchEvent('touchstart', 99, 0) as never);
+    handlers.ontouchend(makeTouchEvent('touchend', 0, 0) as never);
+    expect(onSwipe).not.toHaveBeenCalled();
+
+    // 101 px right-to-left → exceeds 100 px tolerance, swipes left
+    handlers.ontouchstart(makeTouchEvent('touchstart', 101, 0) as never);
+    handlers.ontouchend(makeTouchEvent('touchend', 0, 0) as never);
+    expect(onSwipe).toHaveBeenCalledWith('left');
+  });
+
+  it('resolves "%" tolerances against container clientHeight for vertical keys', () => {
+    expect.assertions(1);
+    const container = document.createElement('div');
+    Object.defineProperty(container, 'clientHeight', { value: 200, configurable: true });
+
+    const onSwipe = vi.fn();
+    const handlers = useSwipe({ onSwipe }, { up: '50%', container });
+
+    handlers.ontouchstart(makeTouchEvent('touchstart', 0, 101) as never);
+    handlers.ontouchend(makeTouchEvent('touchend', 0, 0) as never);
+    expect(onSwipe).toHaveBeenCalledWith('up');
+  });
+
+  it('warns and falls back to numeric parse when "%" is given without a container', () => {
+    expect.assertions(2);
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+
+    const onSwipe = vi.fn();
+    const handlers = useSwipe({ onSwipe }, { left: '50%' });
+
+    // tolerance is parseFloat('50%') = 50; a 60 px swipe should trigger left
+    handlers.ontouchstart(makeTouchEvent('touchstart', 60, 0) as never);
+    handlers.ontouchend(makeTouchEvent('touchend', 0, 0) as never);
+
+    expect(warn).toHaveBeenCalled();
+    expect(onSwipe).toHaveBeenCalledWith('left');
+
+    warn.mockRestore();
+  });
 });

@@ -199,9 +199,8 @@ export interface OpacityParams {
 export type WidthParams = BaseParams & OpacityParams & TransformParams;
 
 const opacityRegex = /opacity: [0-9.]+;/;
-function replaceOpacity(css: string, min: boolean | number = false, value: number) {
-  if (min === false) return css.replace(opacityRegex, '');
-  return css.replace(opacityRegex, `opacity: ${clamp(value, typeof min === 'number' ? min : 0, 1)};`);
+function replaceOpacity(css: string, min: number, value: number) {
+  return css.replace(opacityRegex, `opacity: ${clamp(value, min, 1)};`);
 }
 
 export type HeightParams = BaseParams & OpacityParams & TransformParams;

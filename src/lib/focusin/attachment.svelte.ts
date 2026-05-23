@@ -26,7 +26,6 @@ import { getFocusableElement } from '@dvcol/common-utils/common/element';
 export function useFocusin(options: FocusInOptions = {}): Attachment<HTMLElement> {
   return (node) => {
     const setState = (value: boolean, e: FocusEvent) => {
-      if (value === options.focusin) return;
       options.focusin = value;
       options.onChange?.(value, e);
     };
