@@ -2,6 +2,44 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.0.0](https://github.com/dvcol/svelte-utils/compare/v1.21.1...v3.0.0) (2026-05-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* drop Svelte 4 actions in favor of attachment-based and
+reactive-value APIs. Migration table in README.
+
+- Add useFocusin, useHovering, useSwipe attachments (replace focusin,
+  hovering, swipe actions)
+- Replace useResize/useMutation callbacks with reactive { observe, current,
+  entries|records } returning attachments via .observe
+- Add useMedia wrapping svelte/reactivity MediaQuery; remove useWatchMedia
+- Bump peerDependencies.svelte to >=5.29 (attachments stable)
+- Add jsdom + @testing-library/svelte specs covering each feature folder
+- Add test/Host.svelte and mountAttachment helper for attachment specs
+- Stub ResizeObserver and matchMedia in test/setup.test.ts
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+* **refactor:** ./touch subpath removed — useSwipe rune now exported via
+./swipe.
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)
+
+### Features
+
+* **intersection:** add useIntersection attachment + reactive observer options ([e8af7c6](https://github.com/dvcol/svelte-utils/commit/e8af7c6e1bc6634cc231b2fa2104eb5cb98e6448))
+* replace actions with attachments and reactive primitives ([fbde386](https://github.com/dvcol/svelte-utils/commit/fbde3868662ea5ded7f7138221fc9723b37366af))
+* **transition:** extract utility transition mapping ([8319705](https://github.com/dvcol/svelte-utils/commit/831970522565324ebe3a47effb7b040cdc9857c4))
+
+
+### Bug Fixes
+
+* **async:** cancel pending debounce and tick callbacks on teardown ([1ddb732](https://github.com/dvcol/svelte-utils/commit/1ddb732d56d11d390ad59c0052aca40dafec9544))
+
+
+* **refactor:** reorganize src/lib into feature-scoped folders ([bf1c536](https://github.com/dvcol/svelte-utils/commit/bf1c536b04162849a5cd0476bacc532057c7984d))
+
 ### [1.21.1](https://github.com/dvcol/svelte-utils/compare/v1.21.0...v1.21.1) (2025-07-23)
 
 
