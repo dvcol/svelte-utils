@@ -12,6 +12,22 @@ import { useSwipe as useSwipeRune } from './rune.svelte.js';
  * Pass either an `onSwipe` callback or a full options object with tolerances
  * and scroll state.
  *
+ * ## Reactive options
+ *
+ * Option fields are read inside a `$effect`, so any `$state` field access or
+ * enumerable getter is tracked. Mutating fields on a `$state` options object —
+ * or passing `{ get tolerances(){…} }` — rebuilds the swipe handlers when the
+ * source changes. Only own enumerable properties of `tolerances` are read.
+ *
+ * ## Hoisting
+ *
+ * Because the inner `$effect` reads `parameters` properties (not just the
+ * reference), `const swipe = useSwipe(opts)` is safe when `opts` is a `$state`
+ * object whose fields are mutated. Reassigning the outer variable
+ * (`opts = {...}`) is not tracked through the closure — use the inline
+ * `{@attach useSwipe(opts)}` form or expose the field via a getter for that
+ * case.
+ *
  * @example
  * ```svelte
  * <script lang="ts">
