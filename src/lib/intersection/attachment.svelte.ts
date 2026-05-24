@@ -2,8 +2,6 @@ import type { Attachment } from 'svelte/attachments';
 
 import type { IntersectionOptions, UseIntersection } from './types.js';
 
-import { SvelteMap, SvelteSet } from 'svelte/reactivity';
-
 /**
  * Observe viewport intersection on one or more elements via an
  * `IntersectionObserver`.
@@ -11,11 +9,12 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
  * Returns `{ observe, visible, current, entries }`:
  * - `observe` is the `@attach`-able binding — call it on every node you want
  *   tracked. All nodes share the single observer created by this call.
- * - `visible` is a reactive `SvelteSet` of currently-intersecting nodes —
- *   use `visible.has(node)` for per-node lookups.
- * - `entries` is a `SvelteMap<Element, IntersectionObserverEntry>` keyed by
+ * - `visible` is a plain `Set` of currently-intersecting nodes — read it
+ *   from imperative scopes (see note below).
+ * - `entries` is a plain `Map<Element, IntersectionObserverEntry>` keyed by
  *   target.
- * - `current` is the most recent entry across all observed nodes.
+ * - `current` is the most recent entry across all observed nodes — reactive,
+ *   use this when you need a tracked entrypoint.
  *
  * ## Reactive options
  *
@@ -37,15 +36,23 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
  * Plain `{ root: scrollRef }` reads `scrollRef` at call time (often
  * `undefined` before mount) and never retries.
  *
+ * ## Why `visible` / `entries` are not reactive
+ *
+ * IO batches fire from a browser-scheduled task. A reactive `visible` would
+ * coarsely re-run any `$effect` that reads `.has(x)` whenever *any other*
+ * node's intersection changes — almost never the desired granularity, and
+ * costly on large observed sets. Read `visible` / `entries` from imperative
+ * scopes (event handlers, attachment callbacks, animation hooks). For
+ * per-node reactivity, bind a local `$state` inside an attachment that
+ * flips on intersection. For a single tracked entrypoint, read `current`.
+ *
  * ## Design note — no `createSubscriber`
  *
  * Observer attachments are mount-driven, not read-driven — the observer must
- * run while nodes are attached, regardless of whether `.visible` /
- * `.entries` are currently being read in a tracked scope. A subscriber-gated
- * observer would risk teardown / re-create on read flicker between renders,
- * missing the IO's once-on-observe initial fire. `MediaQuery` (which uses
- * `createSubscriber`) is shapeless — no node, no attachment — hence its
- * different choice.
+ * run while nodes are attached, regardless of whether `.current` is being
+ * read in a tracked scope. A subscriber-gated observer would risk teardown
+ * / re-create on read flicker between renders, missing the IO's
+ * once-on-observe initial fire.
  *
  * @example
  * ```svelte
@@ -55,20 +62,24 @@ import { SvelteMap, SvelteSet } from 'svelte/reactivity';
  *     get root() { return scrollRef; },
  *     rootMargin: '50%',
  *   });
+ *
+ *   function onClick(event: MouseEvent) {
+ *     if (intersection.visible.has(event.currentTarget as Element)) {
+ *       // act only on currently-visible targets
+ *     }
+ *   }
  * </script>
  *
  * <div bind:this={scrollRef}>
  *   {#each rows as row (row.id)}
- *     <div {@attach intersection.observe}>
- *       {intersection.visible.has(rowNode) ? 'visible' : 'hidden'}
- *     </div>
+ *     <div {@attach intersection.observe} onclick={onClick}>…</div>
  *   {/each}
  * </div>
  * ```
  */
 export function useIntersection(options: IntersectionOptions = {}): UseIntersection {
-  const visible = new SvelteSet<Element>();
-  const entries = new SvelteMap<Element, IntersectionObserverEntry>();
+  const visible = new Set<Element>();
+  const entries = new Map<Element, IntersectionObserverEntry>();
   let last = $state<IntersectionObserverEntry | undefined>();
 
   let observer: IntersectionObserver | undefined;
@@ -94,17 +105,22 @@ export function useIntersection(options: IntersectionOptions = {}): UseIntersect
     };
   });
 
+  /*
+   * Returning the cleanup directly (instead of wrapping in `$effect`) keeps
+   * per-node attachment cost flat — wrapping would allocate one reactive
+   * cell per observed node on mount/unmount, scaling poorly with large
+   * observed sets. The shared observer effect above already handles
+   * option-driven re-attach.
+   */
   const observe: Attachment<Element> = (node) => {
-    $effect(() => {
-      tracked.add(node);
-      observer?.observe(node);
-      return () => {
-        tracked.delete(node);
-        observer?.unobserve(node);
-        entries.delete(node);
-        visible.delete(node);
-      };
-    });
+    tracked.add(node);
+    observer?.observe(node);
+    return () => {
+      tracked.delete(node);
+      observer?.unobserve(node);
+      entries.delete(node);
+      visible.delete(node);
+    };
   };
 
   return {

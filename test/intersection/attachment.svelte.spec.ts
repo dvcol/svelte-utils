@@ -156,4 +156,50 @@ describe('useIntersection', () => {
     });
     cleanup();
   });
+
+  it('reading visible.has(x) inside an effect does not subscribe to changes', () => {
+    expect.assertions(1);
+    const cleanup = $effect.root(() => {
+      const intersection = useIntersection();
+      const { node, unmount } = mountAttachment<HTMLElement>(intersection.observe);
+
+      let runs = 0;
+      $effect(() => {
+        intersection.visible.has(node);
+        runs++;
+      });
+      flushSync();
+      const baseline = runs;
+
+      Mock.instances.at(-1)!.trigger([entry(node, true)]);
+      flushSync();
+
+      expect(runs).toBe(baseline);
+      unmount();
+    });
+    cleanup();
+  });
+
+  it('reading entries.has(x) inside an effect does not subscribe to changes', () => {
+    expect.assertions(1);
+    const cleanup = $effect.root(() => {
+      const intersection = useIntersection();
+      const { node, unmount } = mountAttachment<HTMLElement>(intersection.observe);
+
+      let runs = 0;
+      $effect(() => {
+        intersection.entries.has(node);
+        runs++;
+      });
+      flushSync();
+      const baseline = runs;
+
+      Mock.instances.at(-1)!.trigger([entry(node, true)]);
+      flushSync();
+
+      expect(runs).toBe(baseline);
+      unmount();
+    });
+    cleanup();
+  });
 });
