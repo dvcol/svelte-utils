@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [3.2.0](https://github.com/dvcol/svelte-utils/compare/v3.1.0...v3.2.0) (2026-05-24)
+
+
+### Features
+
+* **debounced:** adds setter immediate & expose cancel ([abc464a](https://github.com/dvcol/svelte-utils/commit/abc464a0dd5a24e7796a28e3304feefa6d637fe9))
+
 ## [3.1.0](https://github.com/dvcol/svelte-utils/compare/v3.0.0...v3.1.0) (2026-05-23)
 
 
