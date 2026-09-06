@@ -2,7 +2,7 @@
   "name": "@dvcol/svelte-utils",
   "type": "module",
   "version": "3.2.1",
-  "packageManager": "pnpm@11.2.2",
+  "packageManager": "pnpm@11.25.0",
   "description": "Svelte library for common utility functions and constants",
   "author": "dvcol",
   "license": "MIT",
@@ -155,7 +155,7 @@
     "svelte-check": "^4.4.8",
     "typescript": "^6.0.3",
     "vite": "^8.0.12",
-    "vite-plugin-checker": "^0.13.0",
+    "vite-plugin-checker": "^0.14.0",
     "vitest": "^4.1.5"
   }
 }
